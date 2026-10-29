@@ -75,8 +75,10 @@ Checks: `powershell -File tools/test.ps1` parses the Lua files, runs a smoke tes
 APIs in English and Russian, and builds the craft index over an installed AtlasLoot Classic (needs Python with
 `lupa` and `luaparser`, e.g. `pip install --target .tools/pylib lupa luaparser`).
 
-A release is built by the [BigWigs packager](https://github.com/BigWigsMods/packager) on a version tag
-(`git tag v0.1.0 && git push --tags`); see `.github/workflows/release.yml`.
+Releases: raise `## Version` in the three TOC files and add a section for it to `CHANGELOG.md`; once that is on
+`main`, `.github/workflows/release.yml` tags it and the [BigWigs packager](https://github.com/BigWigsMods/packager)
+builds the zip and publishes it on GitHub (and on CurseForge). Pull requests are checked by
+`.github/workflows/checks.yml`.
 
 ## License
 
