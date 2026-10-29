@@ -1,6 +1,7 @@
-# A release on every push to main (a merged pull request): when the version in the TOC files has no tag yet, the
-# addon is checked, tagged v<version>, packed by the BigWigs packager and published as a GitHub release with
-# CHANGELOG.md as its notes. No new version, no release (as with changes to the README and the like).
+# A release on every push to main (a merged pull request): when the version in the TOC files has no GitHub release
+# yet, the addon is checked, tagged v<version>, packed by the BigWigs packager and published as a GitHub release with
+# CHANGELOG.md as its notes. No new version, no release (as with changes to the README and the like). A run that
+# failed after tagging is finished by running the workflow again (Actions → Release → Run workflow).
 # The same zip goes to CurseForge once the TOC files have ## X-Curse-Project-ID and the repository has the
 # CF_API_KEY secret (Settings → Secrets and variables → Actions).
 name: Release
@@ -27,10 +28,12 @@ jobs:
           fetch-depth: 0
       - name: Version
         id: version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="$(python3 tools/release_check.py --print-version)"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
             echo "new=false" >> "$GITHUB_OUTPUT"
             echo "v$VERSION is already released, nothing to do"
           else
@@ -52,13 +55,24 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "v$VERSION" -m "Craft Compass $VERSION" "$GITHUB_SHA"
-          git push origin "v$VERSION"
+          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+            echo "v$VERSION is tagged already (an earlier run), packaging that commit"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "v$VERSION" -m "Craft Compass $VERSION" "$GITHUB_SHA"
+            git push origin "v$VERSION"
+          fi
+          git checkout -q "v$VERSION"
+      # The packager script itself rather than its action: on a push to a branch the action sees the tag on HEAD and
+      # waits for the tag's own run, but a tag pushed with GITHUB_TOKEN starts no runs. GITHUB_REF tells it this is
+      # the tag's build.
       - name: Package and publish
         if: steps.version.outputs.new == 'true'
-        uses: BigWigsMods/packager@v2
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/BigWigsMods/packager/v2/release.sh -o "$RUNNER_TEMP/release.sh"
+          GITHUB_REF="refs/tags/v$VERSION" bash "$RUNNER_TEMP/release.sh"
