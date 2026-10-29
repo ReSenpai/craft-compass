@@ -1,0 +1,13 @@
+package-as: CraftCompass
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+# Only the addon goes into the zip: repository settings and templates stay in the repository.
+# LICENSE, NOTICE, README and CHANGELOG ship.
+ignore:
+  - .github
+  - .editorconfig
+  - .gitattributes
+  - .gitignore

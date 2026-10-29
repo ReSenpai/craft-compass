@@ -1,0 +1,42 @@
+name: Bug report
+description: Something in the addon does not work as it should.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected and what you saw instead. A screenshot helps.
+    validations:
+      required: true
+  - type: input
+    id: item
+    attributes:
+      label: Item
+      description: For an item with missing or wrong uses, recipes or sources — its name or a link.
+  - type: input
+    id: version
+    attributes:
+      label: Addon version
+      description: From the AddOns list or the release you downloaded.
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Game client language
+      options:
+        - English
+        - Russian
+        - Other
+  - type: textarea
+    id: addons
+    attributes:
+      label: AtlasLoot and Questie
+      description: Whether AtlasLoot Classic and Questie are installed, and their versions.
+  - type: textarea
+    id: errors
+    attributes:
+      label: Lua errors
+      description: If the game showed an error (/console scriptErrors 1, or an addon like BugSack), paste it here.
+      render: text

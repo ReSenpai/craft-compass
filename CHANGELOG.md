@@ -1,0 +1,18 @@
+# Changelog
+
+All notable changes to Craft Compass. The text of this file goes into each release's notes.
+
+## 0.1.0 — 2026-10-29
+
+First version.
+
+- Shift (or Ctrl) over an item: the recipes it goes into, by profession and skill with how many each takes, and the
+  quests that ask for it, filtered to the character's race and class, completed ones marked.
+- Alt pins that into a window: rows with tooltips, click for the item window, Shift-click to link items and quests
+  in chat, Alt or a right click for a nested window beside it. Long lists scroll; Escape closes the windows.
+- What a craft takes, on pinned rows, in the item window and with Shift anywhere: profession and skill, reagents
+  with how many you have against how many it needs, and the recipe — trainer, or the recipe item with its vendors,
+  drops, containers and quest rewards.
+- Data from AtlasLoot Classic (required) and QuestieDB (optional), indexed in the background after login; names in
+  the client's language, the addon's own text in English and Russian.
+- Settings: only my professions, completed quests, the "not used" line. `/craftcompass`, `/ccompass`.

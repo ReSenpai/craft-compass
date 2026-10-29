@@ -1,0 +1,34 @@
+Craft Compass
+Copyright (C) 2026 ReSenpai
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+version. See the LICENSE file for the full text.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+What the license covers
+-----------------------
+All of Craft Compass's own code: Core/, Locales/, Sources/ and UI/.
+
+Data from other addons
+----------------------
+Craft Compass ships no item, recipe or quest data of its own. While the game runs it reads them through the public
+functions of two other addons the player installs separately; none of their code or data is copied into this one:
+
+- AtlasLoot Classic (required): crafts, reagents and recipe items (AtlasLoot.Data.Profession, AtlasLoot.Data.Recipe).
+- QuestieDB, part of Questie (optional): quests, NPCs, objects and where items come from (LibQuestieDB), and
+  Questie's quest link text (QuestieLoader's QuestieLink).
+
+Third-party components
+----------------------
+Libs/ contains libraries of the Ace3 project (https://www.wowace.com/projects/ace3): LibStub, CallbackHandler-1.0,
+AceGUI-3.0 and AceConfig-3.0, copyright the Ace3 Development Team and their authors, released under their own
+BSD-style license, which allows them to be shipped with this program.
+
+Unofficial project
+------------------
+Craft Compass is an unofficial fan project. It is not affiliated with or endorsed by Blizzard Entertainment. World
+of Warcraft and Warcraft are trademarks or registered trademarks of Blizzard Entertainment, Inc. Game icons and
+textures the addon uses are not part of this program: they are referenced by path and loaded from the game client.

@@ -1,0 +1,26 @@
+## Interface: 20506
+## Title: Craft Compass
+## Notes: What an item is used for, what a craft needs and where its recipe comes from. Shift over an item, Alt to pin it. Settings: /craftcompass
+## Notes-ruRU: Для чего нужен предмет, что нужно для крафта и где взять рецепт. Shift над предметом, Alt — закрепить. Настройки: /craftcompass
+## Author: ReSenpai
+## Version: 0.1.0
+## IconTexture: Interface\Icons\INV_Misc_Spyglass_03
+## SavedVariables: CraftCompassDB
+## Dependencies: AtlasLootClassic
+## OptionalDeps: QuestieDB, Questie
+## X-Category: Professions
+## X-License: GPL-3.0-or-later
+## X-Website: https://github.com/ReSenpai/craft-compass
+
+Libs\Libs.xml
+
+Core\Init.lua
+Locales\enUS.lua
+Locales\ruRU.lua
+Core\Util.lua
+Sources\AtlasLoot.lua
+Sources\Questie.lua
+Core\Lines.lua
+UI\PinWindow.lua
+UI\Tooltip.lua
+Core\Options.lua
