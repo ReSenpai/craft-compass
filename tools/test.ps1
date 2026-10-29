@@ -8,6 +8,8 @@ $env:PYTHONIOENCODING = "utf-8"
 
 python (Join-Path $root "tests\check_syntax.py")
 if ($LASTEXITCODE -ne 0) { exit 1 }
+python (Join-Path $root "tools\release_check.py")
+if ($LASTEXITCODE -ne 0) { exit 1 }
 foreach ($locale in "enUS", "ruRU") {
     python (Join-Path $root "tests\smoke.py") $locale
     if ($LASTEXITCODE -ne 0) { exit 1 }

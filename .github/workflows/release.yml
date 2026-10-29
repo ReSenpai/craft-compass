@@ -1,23 +1,64 @@
-# Builds the zip and publishes it on a version tag (git tag v1.0.0 && git push --tags):
-# a GitHub release always; CurseForge once the TOC files have
-# ## X-Curse-Project-ID and the repository has the CF_API_KEY secret.
+# A release on every push to main (a merged pull request): when the version in the TOC files has no tag yet, the
+# addon is checked, tagged v<version>, packed by the BigWigs packager and published as a GitHub release with
+# CHANGELOG.md as its notes. No new version, no release (as with changes to the README and the like).
+# The same zip goes to CurseForge once the TOC files have ## X-Curse-Project-ID and the repository has the
+# CF_API_KEY secret (Settings → Secrets and variables → Actions).
 name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    env:
-      CF_API_KEY: ${{ secrets.CF_API_KEY }}
-      GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: BigWigsMods/packager@v2
+      - name: Version
+        id: version
+        run: |
+          VERSION="$(python3 tools/release_check.py --print-version)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+            echo "new=false" >> "$GITHUB_OUTPUT"
+            echo "v$VERSION is already released, nothing to do"
+          else
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-python@v5
+        if: steps.version.outputs.new == 'true'
+        with:
+          python-version: "3.12"
+      - name: Checks
+        if: steps.version.outputs.new == 'true'
+        run: |
+          python -m pip install --quiet "lupa==2.8" "luaparser==4.2.0"
+          python tests/check_syntax.py
+          python tests/smoke.py enUS
+          python tests/smoke.py ruRU
+      - name: Tag
+        if: steps.version.outputs.new == 'true'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "v$VERSION" -m "Craft Compass $VERSION" "$GITHUB_SHA"
+          git push origin "v$VERSION"
+      - name: Package and publish
+        if: steps.version.outputs.new == 'true'
+        uses: BigWigsMods/packager@v2
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}

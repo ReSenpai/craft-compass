@@ -1,0 +1,35 @@
+# Uploads a released version to CurseForge by hand (Actions → CurseForge → Run workflow): for a version that came
+# out on GitHub before the CurseForge project existed, or to retry a failed upload. New versions go to CurseForge
+# by themselves, from release.yml.
+name: CurseForge
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to upload, e.g. v0.1.0 (empty: the latest)"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check out the tag
+        env:
+          TAG: ${{ inputs.tag }}
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+        run: |
+          TAG="${TAG:-$(git describe --tags --abbrev=0 --match 'v*')}"
+          git checkout -q "$TAG"
+          grep -q '^## X-Curse-Project-ID:' CraftCompass_Vanilla.toc || { echo "$TAG: no ## X-Curse-Project-ID in the TOC files"; exit 1; }
+          test -n "$CF_API_KEY" || { echo "no CF_API_KEY secret (Settings → Secrets and variables → Actions)"; exit 1; }
+      # Without GITHUB_OAUTH the packager leaves the GitHub release alone and only uploads to CurseForge
+      - uses: BigWigsMods/packager@v2
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
