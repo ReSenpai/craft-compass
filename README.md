@@ -79,8 +79,6 @@ A release is built by the [BigWigs packager](https://github.com/BigWigsMods/pack
 ## License
 
 Craft Compass is free software under the [GNU General Public License v3.0](LICENSE) or later; see [NOTICE](NOTICE)
-for what it covers and the libraries it ships. The idea of showing an item's uses in its tooltip is old and shared
-by several addons, among them What's That For?; Craft Compass is written from scratch and shares no code or data
-with them.
+for what it covers and the libraries it ships. Contributions are welcome, see [CONTRIBUTING](CONTRIBUTING.md).
 
 Craft Compass is an unofficial fan project, not affiliated with or endorsed by Blizzard Entertainment.
