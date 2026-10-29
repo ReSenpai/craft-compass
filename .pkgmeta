@@ -11,3 +11,6 @@ ignore:
   - .editorconfig
   - .gitattributes
   - .gitignore
+  - .tools
+  - tests
+  - tools

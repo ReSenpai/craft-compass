@@ -69,6 +69,10 @@ Recipes are what AtlasLoot Classic knows about; Season of Discovery's own recipe
 - `UI/Tooltip.lua` — the tooltip hooks; `UI/PinWindow.lua` — the pinned windows; `Core/Options.lua` — the settings.
 - `Libs/` — the Ace3 libraries behind the options panel.
 
+Checks: `powershell -File tools/test.ps1` parses the Lua files, runs a smoke test against stubbed game and addon
+APIs in English and Russian, and builds the craft index over an installed AtlasLoot Classic (needs Python with
+`lupa` and `luaparser`, e.g. `pip install --target .tools/pylib lupa luaparser`).
+
 A release is built by the [BigWigs packager](https://github.com/BigWigsMods/packager) on a version tag
 (`git tag v0.1.0 && git push --tags`); see `.github/workflows/release.yml`.
 

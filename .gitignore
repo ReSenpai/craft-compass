@@ -9,3 +9,6 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 __pycache__/
+
+# Python libraries for the tests (pip install --target .tools/pylib lupa luaparser)
+.tools/
