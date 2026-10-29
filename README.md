@@ -19,7 +19,7 @@ gather before you ask a crafter.
   with how many of it each takes, and the quests that ask for it, the completed ones marked.
 - **Pinned windows.** Hold **Alt** over an item to pin that list into a window that stays on screen. Hover a row for
   its tooltip, click it for the item window, **Shift-click** to link it in chat. Alt over a row (or a right click)
-  opens a nested window beside it, as deep as you like. Long lists scroll; Escape closes them all.
+  opens a nested window beside it, as deep as you like. **Alt-click** an item link in chat to pin that item too. Long lists scroll; Escape closes them all.
 - **What a craft takes.** Hover a craftable item in a pinned window, click it, or hold Shift over it anywhere: the
   profession and skill that make it, every reagent with how many you have (bags and bank) against how many it needs,
   and its recipe — taught by the trainer, or the recipe item and who sells it, which creatures drop it, where it is

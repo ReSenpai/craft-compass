@@ -2,7 +2,7 @@
 Pinned windows: what an item is used for, kept on screen. Alt over an item opens one; Alt over a
 row of a window (or a right click on it) opens a nested window beside it, one level deeper.
 Rows are buttons: hover shows the row's tooltip, a click opens the item window, Shift-click
-links the item or quest in chat.
+links the item or quest in chat. Alt-click on an item link in chat opens a window too.
 ]]
 local _, ns = ...
 local L, Util, Lines, Quests = ns.L, ns.Util, ns.Lines, ns.Quests
@@ -61,7 +61,8 @@ local function Row_OnClick(row, button)
             InsertChatLink(Quests.GetChatLink(row.quest))
         end
     elseif row.link then
-        if button == "RightButton" then
+        -- With Alt the row is opened nested, not as a new first window by the chat link hook.
+        if button == "RightButton" or IsAltKeyDown() then
             PinWindow.OpenNested(row)
         elseif IsModifiedClick("CHATLINK") then
             InsertChatLink(row.link)
@@ -290,3 +291,12 @@ function PinWindow.RefreshPending()
         end
     end
 end
+
+-- Alt-click on an item link (chat, quest log and anything else that goes through SetItemRef)
+-- pins the item instead of opening the item window.
+hooksecurefunc("SetItemRef", function (link, text)
+    if IsAltKeyDown() and type(link) == "string" and link:match("^item:") and text then
+        PinWindow.Show(1, text)
+        ItemRefTooltip:Hide()
+    end
+end)

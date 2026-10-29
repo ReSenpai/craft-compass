@@ -2,6 +2,11 @@
 
 All notable changes to Craft Compass. The text of this file goes into each release's notes.
 
+## Unreleased
+
+- Alt-click on an item link in chat (or anywhere else a link opens the item window) pins it into a window.
+  Alt-click on a row of a pinned window opens it nested, like a right click.
+
 ## 0.1.0 — 2026-10-29
 
 First version.

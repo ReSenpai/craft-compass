@@ -78,7 +78,11 @@ IsShiftKeyDown = function() return SHIFT end
 IsControlKeyDown = function() return false end
 IsModifiedClick = function() return true end
 ChatEdit_InsertLink = function(t) INSERTED = t; return true end
-SetItemRef = function() end
+SetItemRef = function(link) ITEMREF = link end
+hooksecurefunc = function(name, hook)
+    local original = _G[name]
+    _G[name] = function(...) local r = {original(...)}; hook(...); return unpack(r) end
+end
 LibStub = setmetatable({}, {__call = function(_, name)
     return {RegisterOptionsTable = function() end, AddToBlizOptions = function() end, Open = function() OPENED = true end}
 end})
@@ -193,6 +197,27 @@ p("after close: window2 shown=" .. tostring(CraftCompassWindow2.shown))
 ItemRefTooltip.itemName, ItemRefTooltip.itemLink = GetItemInfo(2302)
 ItemRefTooltip.scripts.OnTooltipSetItem(ItemRefTooltip)
 dump("item window for boots")
+
+-- Alt-click on an item link in chat pins it instead of opening the item window
+SHIFT, ALT = false, true
+ItemRefTooltip.shown = true
+local _, bootsLink = GetItemInfo(2302)
+SetItemRef("item:2302::::", bootsLink, "LeftButton")
+p("chat alt-click: window1 shown=" .. tostring(CraftCompassWindow1.shown) .. " title=" .. tostring(CraftCompassWindow1.title.text.text) .. " itemref shown=" .. tostring(ItemRefTooltip.shown))
+-- a plain click still opens the item window
+ALT = false
+ItemRefTooltip.shown = true
+SetItemRef("item:2318::::", (select(2, GetItemInfo(2318))), "LeftButton")
+p("chat click: window1 title=" .. tostring(CraftCompassWindow1.title.text.text) .. " itemref shown=" .. tostring(ItemRefTooltip.shown))
+-- Alt-click on a row of a window opens it nested, not as a new first window
+SHIFT, ALT = false, true
+CraftCompassWindow1:Hide()
+GameTooltip.owner = UIParent
+GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(2318)
+GameTooltip.scripts.OnTooltipSetItem(GameTooltip)
+for _, row in ipairs(CraftCompassWindow1.rows) do if row.link and row.link:find("item:2302") then row.scripts.OnClick(row, "LeftButton") end end
+p("row alt-click: window1 title=" .. tostring(CraftCompassWindow1.title.text.text) .. " window2 shown=" .. tostring(CraftCompassWindow2.shown))
+ALT = false
 
 FIRE("GET_ITEM_INFO_RECEIVED")
 FIRE("MODIFIER_STATE_CHANGED")
