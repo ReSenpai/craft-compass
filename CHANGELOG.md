@@ -9,6 +9,7 @@ All notable changes to Craft Compass. The text of this file goes into each relea
 - A pinned window of a crafted item starts with what its craft takes, and the reagents are rows like the rest:
   hover one for its tooltip, Alt or right click it for its own window — where it comes from and how it is made.
   The item window a link opens says so.
+- The close button of a pinned window works in combat too.
 
 ## 0.1.0 — 2026-10-29
 

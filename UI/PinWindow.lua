@@ -130,6 +130,11 @@ local function CreateWindow(level)
 
     local close = CreateFrame("Button", nil, window, "UIPanelCloseButton")
     close:SetPoint("TOPRIGHT", -2, -2)
+    -- The template closes through HideUIPanel, which is blocked in combat; this window isn't a
+    -- panel and can always be hidden directly.
+    close:SetScript("OnClick", function ()
+        window:Hide()
+    end)
 
     -- The title is the item itself; it can be hovered, clicked and dragged like the window.
     window.title = CreateRow(window, window)
