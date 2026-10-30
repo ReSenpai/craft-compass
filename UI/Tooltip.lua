@@ -4,7 +4,7 @@ instead. A craftable item also gets what its craft takes: with Shift, on rows of
 and always in the item window a click on a link opens.
 ]]
 local _, ns = ...
-local Util, Lines, Crafts, PinWindow = ns.Util, ns.Lines, ns.Crafts, ns.PinWindow
+local L, Util, Lines, Crafts, PinWindow = ns.L, ns.Util, ns.Lines, ns.Crafts, ns.PinWindow
 
 local Tooltip = {}
 ns.Tooltip = Tooltip
@@ -59,6 +59,10 @@ local function OnTooltipSetItem(tooltip)
         if spellId then
             isPending = AddCraft(tooltip, spellId)
             added = true
+            -- Reagents can't be clicked in the item window; a pinned window lets them be opened.
+            if isItemWindow then
+                tooltip:AddLine(L.PinLinkHint, 0.65, 0.65, 0.65, true)
+            end
         end
     end
 

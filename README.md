@@ -20,10 +20,11 @@ gather before you ask a crafter.
 - **Pinned windows.** Hold **Alt** over an item to pin that list into a window that stays on screen. Hover a row for
   its tooltip, click it for the item window, **Shift-click** to link it in chat. Alt over a row (or a right click)
   opens a nested window beside it, as deep as you like. **Alt-click** an item link in chat to pin that item too. Long lists scroll; Escape closes them all.
-- **What a craft takes.** Hover a craftable item in a pinned window, click it, or hold Shift over it anywhere: the
+- **What a craft takes.** Pin a crafted item, hover it in a pinned window, click it, or hold Shift over it anywhere: the
   profession and skill that make it, every reagent with how many you have (bags and bank) against how many it needs,
   and its recipe — taught by the trainer, or the recipe item and who sells it, which creatures drop it, where it is
-  found and which quest rewards it.
+  found and which quest rewards it. In a pinned window the reagents open in nested windows like any other row, so
+  you can follow an oil or a thread back to where it comes from.
 - **Quests in chat.** Shift-click a quest in a pinned window to link it in chat, in the `[Name (id)]` form Questie
   turns into a clickable quest link.
 - **Any client language.** Everything is looked up by id, and item, quest, profession and zone names come in the

@@ -204,6 +204,14 @@ ItemRefTooltip.shown = true
 local _, bootsLink = GetItemInfo(2302)
 SetItemRef("item:2302::::", bootsLink, "LeftButton")
 p("chat alt-click: window1 shown=" .. tostring(CraftCompassWindow1.shown) .. " title=" .. tostring(CraftCompassWindow1.title.text.text) .. " itemref shown=" .. tostring(ItemRefTooltip.shown))
+-- the boots window starts with what the craft takes; a right click on a reagent opens it nested
+local reagentRow
+for i, row in ipairs(CraftCompassWindow1.rows) do
+    if row.shown then p(string.format("  boots row %d: %s | %s link=%s", i, row.text.text, row.right.text, tostring(row.link ~= nil))) end
+    if not reagentRow and row.shown and row.link and row.link:find("item:2318") then reagentRow = row end
+end
+reagentRow.scripts.OnClick(reagentRow, "RightButton")
+p("reagent right-click: window2 shown=" .. tostring(CraftCompassWindow2.shown) .. " title=" .. tostring(CraftCompassWindow2.title.text.text))
 -- a plain click still opens the item window
 ALT = false
 ItemRefTooltip.shown = true

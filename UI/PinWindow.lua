@@ -1,5 +1,6 @@
 --[[
-Pinned windows: what an item is used for, kept on screen. Alt over an item opens one; Alt over a
+Pinned windows: what an item is used for, and for a crafted item what its craft takes, kept on
+screen; reagents are rows like the rest, so they open in turn. Alt over an item opens one; Alt over a
 row of a window (or a right click on it) opens a nested window beside it, one level deeper.
 Rows are buttons: hover shows the row's tooltip, a click opens the item window, Shift-click
 links the item or quest in chat. Alt-click on an item link in chat opens a window too.
@@ -248,7 +249,7 @@ function PinWindow.Show(level, link, isRefresh)
         windows[level + 1]:Hide()
     end
 
-    local lines, pending = Lines.ForItemUses(itemId)
+    local lines, pending = Lines.ForWindow(itemId)
     window.link = link
     window.pending = pending
     window.title.link = link

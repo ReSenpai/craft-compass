@@ -221,13 +221,14 @@ function Lines.ForCraft(spellId)
 
     for i, reagentId in ipairs(craft[6] or {}) do
         local needed = craft[7] and craft[7][i] or 1
-        local reagentName = Util.GetItemInfo(reagentId)
+        local reagentName, reagentLink = Util.GetItemInfo(reagentId)
         pending = pending or reagentName == nil
         local have = Util.GetItemCount(reagentId, true) or 0
         table.insert(lines, {
             text = Util.Icon(Util.GetItemIcon(reagentId)) .. (reagentName or "..."),
             right = have .. "/" .. needed,
-            rightColor = have >= needed and ENOUGH_COLOR or nil
+            rightColor = have >= needed and ENOUGH_COLOR or nil,
+            link = reagentLink
         })
     end
 
@@ -241,6 +242,26 @@ function Lines.ForCraft(spellId)
         table.insert(lines, {text = L.Recipe .. ": |cffffffff" .. L.Trainer .. "|r", color = MUTED_COLOR})
     end
     return lines, pending
+end
+
+--[[
+A pinned window's lines: what the item's craft takes, if it is crafted, so its reagents can be
+opened in turn, then what the item is used for.
+]]
+function Lines.ForWindow(itemId)
+    local lines, pending = Lines.ForItemUses(itemId)
+    local spellId = Crafts.ForCreatedItem(itemId)
+    local craftLines, craftPending
+    if spellId then
+        craftLines, craftPending = Lines.ForCraft(spellId)
+    end
+    if not craftLines then
+        return lines, pending
+    end
+    for _, line in ipairs(lines) do
+        table.insert(craftLines, line)
+    end
+    return craftLines, pending or craftPending
 end
 
 --- Draws lines into a tooltip.
