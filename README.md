@@ -13,18 +13,53 @@ gather before you ask a crafter.
 [![WoW Classic Era](https://img.shields.io/badge/WoW-Classic%20Era%201.15-c79c6e)](#compatibility)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
+![Someone links a leather armour in chat: Alt-click it, and the window shows what it takes; hovering Shadow Oil shows how that is made](docs/images/chat-crafted-item.jpg)
+
+*Someone offers to craft a piece of armour: Alt-click its link in chat, see the reagents, and hover the one you don't
+know where to get. Screenshots are from a Russian client.*
+
 ## What does it do?
 
-- **Uses in the tooltip.** Hold **Shift** (or Ctrl) over an item: the recipes it goes into, by profession and skill
-  with how many of it each takes, and the quests that ask for it, the completed ones marked.
-- **Pinned windows.** Hold **Alt** over an item to pin that list into a window that stays on screen. Hover a row for
-  its tooltip, click it for the item window, **Shift-click** to link it in chat. Alt over a row (or a right click)
-  opens a nested window beside it, as deep as you like. **Alt-click** an item link in chat to pin that item too. Long lists scroll; Escape closes them all.
-- **What a craft takes.** Pin a crafted item, hover it in a pinned window, click it, or hold Shift over it anywhere: the
-  profession and skill that make it, every reagent with how many you have (bags and bank) against how many it needs,
-  and its recipe — taught by the trainer, or the recipe item and who sells it, which creatures drop it, where it is
-  found and which quest rewards it. In a pinned window the reagents open in nested windows like any other row, so
-  you can follow an oil or a thread back to where it comes from.
+### What an item is used for
+
+Hold **Shift** (or Ctrl) over an item: the recipes it goes into, by profession and skill with how many of it each
+takes, and the quests that ask for it, the completed ones marked.
+
+![Shift over Briarthorn: the alchemy recipes that use it](docs/images/shift-tooltip.png)
+
+### Pinned windows
+
+Hold **Alt** over an item to pin that list into a window that stays on screen. Hover a row for its tooltip, click it
+for the item window, **Shift-click** to link it in chat. Long lists scroll; Escape closes them all.
+
+![A pinned window for Briarthorn; Healing Potion hovered in it shows what it takes and what it is used for](docs/images/pinned-window.png)
+
+Alt over a row (or Alt-click, or a right click) opens a nested window beside it, as deep as you like: from a herb to
+the elixir made of it to the belt made of that.
+
+![Three nested windows: Briarthorn, Elixir of Wisdom, Hillman's Belt](docs/images/nested-windows.png)
+
+### Items from chat
+
+**Alt-click** an item link in chat to pin it instead of opening the item window. A plain click opens the item window
+as usual, with what the craft takes added and a reminder that Alt-click lets you open the reagents.
+
+| Alt-click a link | A plain click |
+| --- | --- |
+| ![Alt-click on a link in chat opens a pinned window](docs/images/chat-alt-click.png) | ![A plain click on a link in chat opens the game's item window](docs/images/chat-click.png) |
+
+### What a craft takes
+
+Pin a crafted item, hover it in a pinned window, click it, or hold Shift over it anywhere: the profession and skill
+that make it, every reagent with how many you have (bags and bank) against how many it needs, and its recipe:
+taught by the trainer, or the recipe item and who sells it, which creatures drop it, where it is found and which
+quest rewards it. In a pinned window the reagents open in nested windows like any other row, so you can follow an
+oil or a thread back to where it comes from.
+
+![The item window of Swiftness Potion: alchemy, its reagents and where the recipe is found](docs/images/item-window.png)
+
+### And also
+
 - **Quests in chat.** Shift-click a quest in a pinned window to link it in chat, in the `[Name (id)]` form Questie
   turns into a clickable quest link.
 - **Any client language.** Everything is looked up by id, and item, quest, profession and zone names come in the
@@ -39,6 +74,10 @@ gather before you ask a crafter.
 
 Craft Compass carries no item data of its own: it reads them from these addons while the game runs, so it stays as
 up to date as they are. Without Questie there are no quests and a recipe is shown without its sources.
+
+**Works well with** [ItemTooltipProfessionIcons](https://www.curseforge.com/wow/search?search=ItemTooltipProfessionIcons) (optional): the row of profession icons in the
+item tooltips on the screenshots comes from it. It shows at a glance which professions use an item; Craft
+Compass adds the details with Shift or Alt.
 
 ## Installation
 

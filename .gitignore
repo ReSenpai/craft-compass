@@ -12,3 +12,4 @@ __pycache__/
 
 # Python libraries for the tests (pip install --target .tools/pylib lupa luaparser)
 .tools/
+/reference/

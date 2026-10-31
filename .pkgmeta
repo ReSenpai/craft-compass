@@ -11,6 +11,7 @@ ignore:
   - .editorconfig
   - .gitattributes
   - .gitignore
+  - docs
   - CONTRIBUTING.md
   - SECURITY.md
   - .tools
