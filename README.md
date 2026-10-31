@@ -13,7 +13,7 @@ gather before you ask a crafter.
 [![WoW Classic Era](https://img.shields.io/badge/WoW-Classic%20Era%201.15-c79c6e)](#compatibility)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
-![Someone links a leather armour in chat: Alt-click it, and the window shows what it takes; hovering Shadow Oil shows how that is made](docs/images/chat-crafted-item.jpg)
+![Someone links a leather armour in chat: Alt-click it, and the window shows what it takes; hovering Shadow Oil shows how that is made](docs/images/chat-crafted-item.png)
 
 *Someone offers to craft a piece of armour: Alt-click its link in chat, see the reagents, and hover the one you don't
 know where to get. Screenshots are from a Russian client.*
