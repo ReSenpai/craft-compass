@@ -140,6 +140,8 @@ CraftCompass                            — Craft Compass
 
 Рецепты — те, что знает AtlasLoot Classic; собственных рецептов Season of Discovery в нём нет.
 
+Как аддон устроен внутри — в [docs/ARCHITECTURE.ru.md](docs/ARCHITECTURE.ru.md).
+
 ## Лицензия
 
 Craft Compass — свободная программа под [GNU General Public License v3.0](LICENSE) или более поздней версии; что

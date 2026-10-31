@@ -25,6 +25,8 @@ mklink /J "C:\Program Files (x86)\World of Warcraft\_classic_era_\Interface\AddO
 - `Libs/` — the Ace3 libraries behind the options panel.
 - `tests/`, `tools/` — the checks below. Neither goes into the release zip.
 
+How the modules fit together is described in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
 ## Data
 
 Craft Compass ships no item, recipe or quest data: everything comes from AtlasLoot Classic and QuestieDB while the
