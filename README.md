@@ -3,7 +3,7 @@
 **What is this item for, and what does it take to make that? A tooltip and pinned windows for World of Warcraft
 Classic.**
 
-**English** · [Русский](README.ru.md)
+**English** · [Русский](README.ru.md) · [Architecture](docs/ARCHITECTURE.md)
 
 Hover a herb, an ore or a piece of cloth and see every recipe and quest that uses it. Pin that list into a window,
 follow a potion into what *it* is used for, and see for any craftable item which profession makes it, which

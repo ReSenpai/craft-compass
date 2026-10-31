@@ -1,6 +1,6 @@
 # Craft Compass architecture
 
-**English** | [Русский](ARCHITECTURE.ru.md)
+**English** · [Русский](ARCHITECTURE.ru.md) · [README](../README.md)
 
 How the addon is put together: where its data comes from, how a tooltip or a pinned window gets its lines, and what
 happens on each click. For setting up the repository and running the checks, see [CONTRIBUTING.md](../CONTRIBUTING.md).
