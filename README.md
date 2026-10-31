@@ -81,17 +81,16 @@ Compass adds the details with Shift or Alt.
 
 ## Installation
 
-Download the zip of a release and unpack it into `World of Warcraft\_classic_era_\Interface\AddOns`, so that you get
-`Interface\AddOns\CraftCompass\CraftCompass_Vanilla.toc`.
-
-To run it straight from a clone of this repository, link the clone into the AddOns folder under the addon's name
-(from a Command Prompt):
-
-```bat
-mklink /J "C:\Program Files (x86)\World of Warcraft\_classic_era_\Interface\AddOns\CraftCompass" "C:\path\to\craft-compass"
-```
+1. Install **AtlasLoot Classic** and, if you like, **Questie** (from the CurseForge app or their pages).
+2. Download `CraftCompass-v<version>.zip` from the [latest release](https://github.com/ReSenpai/craft-compass/releases/latest)
+   and unpack it into `World of Warcraft\_classic_era_\Interface\AddOns`. You should get the folder
+   `Interface\AddOns\CraftCompass`.
+3. Restart the game (or `/reload` if it is running) and check on the character screen, under AddOns, that Craft
+   Compass and AtlasLoot Classic are enabled.
 
 Settings: `/craftcompass` or `/ccompass`, or the AddOns tab of the game options.
+
+To remove it, delete the `Interface\AddOns\CraftCompass` folder.
 
 ## Compatibility
 

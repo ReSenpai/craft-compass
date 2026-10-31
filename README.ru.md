@@ -84,7 +84,7 @@ Compass добавляет подробности по Shift или Alt.
 ## Установка
 
 1. **AtlasLoot Classic** и, по желанию, **Questie** — из приложения CurseForge или вручную, с их страниц.
-2. **Craft Compass.** Скачайте zip из [последнего релиза](https://github.com/ReSenpai/craft-compass/releases/latest)
+2. **Craft Compass.** Скачайте `CraftCompass-v<версия>.zip` из [последнего релиза](https://github.com/ReSenpai/craft-compass/releases/latest)
    и распакуйте в `World of Warcraft\_classic_era_\Interface\AddOns` — должна получиться папка
    `Interface\AddOns\CraftCompass` с файлом `CraftCompass_Vanilla.toc` внутри.
 3. Перезапустите игру (или `/reload`, если она уже открыта) и проверьте, что в списке модификаций на экране выбора
