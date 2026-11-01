@@ -103,8 +103,9 @@ step. It takes items from:
 checked with arithmetic: Lua 5.1 has no bit operators, and the client's `bit.band` stops at 32 bits.
 
 QuestieDB also provides where items come from (`Item` fields `vendors`, `npcDrops`, `objectDrops`, `itemDrops`, `questRewards`), NPC
-faction (`friendlyToFaction`: `"A"`, `"H"`, `"AH"`) and zones (`zoneID`, `zoneOrSort`, named through
-`C_Map.GetAreaInfo`).
+faction (`friendlyToFaction`: `"A"`, `"H"`, `"AH"`), NPC level (`minLevel`, `maxLevel`) and zones (`zoneID`,
+`zoneOrSort`, named through `C_Map.GetAreaInfo`). An NPC or object shows its main zone and then the other zones of
+its `spawns`: the Darkmoon Faire's vendors have `zoneID` Mulgore, but stand in Elwynn Forest too.
 
 Without QuestieDB there are no quests, and items and recipes are shown without their sources. Calls into other addons go
 through `Util.SafeCall`, so a change in their API doesn't break tooltips.
@@ -134,8 +135,9 @@ A line is a table:
 | `color` | `{r, g, b}` of the left text, white by default |
 | `right`, `rightColor` | right text and its colour (`x4`, `3/4`) |
 | `link` | the item or spell link the line stands for; in a pinned window the row becomes clickable |
+| `open` | a list a click opens in a nested window: `{kind, itemId, label}`, built by `Lines.ForList` |
 | `quest` | the quest id the line stands for |
-| `wrap` | let a long text wrap in tooltips |
+| `wrap` | let a long text wrap: tooltips wrap it, pinned windows wrap it at a set width |
 | `spacer` | an empty line between sections |
 
 Builders return `lines, pending`, where `pending` means some item names weren't cached yet:
@@ -149,6 +151,8 @@ Builders return `lines, pending`, where `pending` means some item names weren't 
 - `Lines.ForSources(itemId)` — "where to get": the gathering profession with its skill and the top three zones,
   then vendors, drops, objects, containers and quest rewards from QuestieDB. Each list names two and adds
   "and N more"; names are looked up only for those two, since cloth drops from hundreds of NPCs.
+- `Lines.ForList(open)` — the whole list behind a source line: vendors (the other faction last, greyed out),
+  creatures with level and zones, objects, containers (item rows), quests, or zones with their spawn points.
 - `Lines.ForOrigin(itemId)` — `ForCraft` of the item's craft, if it is crafted, followed by `ForSources`.
 - `Lines.ForWindow(itemId)` — for a pinned window: `ForOrigin`, then `ForItemUses`. Reagents are ordinary rows
   with links, so they open like any other item.
@@ -181,8 +185,11 @@ What gets added:
 Windows are frames `CraftCompassWindow1`, `CraftCompassWindow2`, … by nesting level. They are created on first use
 and reused after that. Level 1 is opened from a tooltip or from chat; level *n + 1* from a row of level *n*.
 
+- **Content:** a window shows either an item (`PinWindow.Show`: `Lines.ForWindow`) or a source list
+  (`PinWindow.OpenList`: `Lines.ForList`), through one `ShowContent(level, {key, title, titleLink, build})`.
 - **Layout:** the title is the item link itself (a row, so it can be hovered and clicked), and below it a scroll
-  frame of rows. The width fits the longest row. The height stops at 60% of the screen; past that the list scrolls
+  frame of rows. The width fits the longest row; rows marked `wrap` (sources) take at most 320 pixels beyond that
+  and wrap, growing in height instead. The height stops at 60% of the screen; past that the list scrolls
   (mouse wheel or the bar).
 - **Placement:** level 1 opens in the centre and stays where the player dragged it. A nested window opens beside its
   parent, on the side with room.
@@ -199,6 +206,9 @@ What a row does:
 | Click | item window (`SetItemRef`) | — |
 | Shift-click | link in chat | `[Name (id)]` in chat, which Questie makes a quest link |
 | Right click, Alt-click, Alt over it | nested window one level deeper | — |
+
+A source row (zones, sold by, drops from, found in, contained in, quest reward) shows a hint on hover and opens its
+whole list one level deeper on any click.
 
 **Items from chat:** `hooksecurefunc("SetItemRef", ...)` sees every link click: chat, quest log and anything else
 that goes through `SetItemRef`. With Alt held on an `item:` link, the addon opens a level 1 window for it and

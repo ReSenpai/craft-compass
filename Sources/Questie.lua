@@ -108,16 +108,47 @@ function Quests.GetChatLink(questId)
     return "[" .. Quests.GetName(questId) .. " (" .. questId .. ")]"
 end
 
---- "Name (Zone)" for an NPC or object.
+--[[
+The zones an NPC or object appears in: its main zone first, then the others it has spawn points in
+(the Darkmoon Faire's vendors stand in two). At most `limit` names, and how many zones there are.
+]]
+function Quests.GetZoneNames(entity, id, limit)
+    local zoneIds = {}
+    local mainZone = Quests.Get(entity, id, "zoneID")
+    if type(mainZone) == "number" and mainZone > 0 then
+        table.insert(zoneIds, mainZone)
+    end
+    local spawns = Quests.Get(entity, id, "spawns")
+    local others = {}
+    for zoneId in pairs(type(spawns) == "table" and spawns or {}) do
+        if zoneId ~= mainZone then
+            table.insert(others, zoneId)
+        end
+    end
+    table.sort(others)
+    for _, zoneId in ipairs(others) do
+        table.insert(zoneIds, zoneId)
+    end
+
+    local names = {}
+    for _, zoneId in ipairs(zoneIds) do
+        local zone = C_Map and C_Map.GetAreaInfo and C_Map.GetAreaInfo(zoneId)
+        if zone and zone ~= "" and #names < limit then
+            table.insert(names, zone)
+        end
+    end
+    return names, #zoneIds
+end
+
+--- "Name (Zone)" for an NPC or object, or "Name (Zone, Zone)" when it stands in two.
 function Quests.GetPlaceName(entity, id)
     local name = Quests.Get(entity, id, "name")
     if not name then
         return nil
     end
-    local zoneId = Quests.Get(entity, id, "zoneID")
-    local zone = zoneId and C_Map and C_Map.GetAreaInfo and C_Map.GetAreaInfo(zoneId)
-    if zone and zone ~= "" then
-        return name .. " (" .. zone .. ")"
+    local zones = Quests.GetZoneNames(entity, id, 2)
+    if #zones > 0 then
+        return name .. " (" .. table.concat(zones, ", ") .. ")"
     end
     return name
 end

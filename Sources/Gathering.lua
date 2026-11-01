@@ -217,14 +217,17 @@ function Gathering.Get(itemId)
     return profession, skill
 end
 
---- The zones where an item's herbs or veins grow, the ones with the most of them first.
+--[[
+The zones where an item's herbs or veins grow, the ones with the most of them first, and how many
+spawn points each zone has.
+]]
 function Gathering.GetZones(itemId)
     local nodes = ITEM_NODES[itemId]
     if not nodes or not Quests.IsAvailable() then
-        return {}
+        return {}, {}
     end
     if zonesByItem[itemId] then
-        return zonesByItem[itemId]
+        return unpack(zonesByItem[itemId])
     end
     EnsureIndex()
     local counts = {}
@@ -246,8 +249,8 @@ function Gathering.GetZones(itemId)
         end
         return a < b
     end)
-    zonesByItem[itemId] = zones
-    return zones
+    zonesByItem[itemId] = {zones, counts}
+    return zones, counts
 end
 
 --- Whether a QuestieDB object is a herb or a vein, which the gathering line already covers.

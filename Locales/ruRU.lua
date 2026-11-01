@@ -20,6 +20,8 @@ L.QuestReward = "Награда за задание"
 L.ContainedIn = "Внутри"
 L.WhereToGet = "Где взять"
 L.Zones = "Зоны"
+L.NodesPerZone = "Сколько точек появления в каждой зоне."
+L.OpenListHint = "Щелчок — весь список."
 L.AndMore = "и ещё %d"
 
 -- Настройки

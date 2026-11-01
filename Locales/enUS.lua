@@ -17,6 +17,8 @@ L.QuestReward = "Quest reward"
 L.ContainedIn = "Contained in"
 L.WhereToGet = "Where to get"
 L.Zones = "Zones"
+L.NodesPerZone = "How many spawn points each zone has."
+L.OpenListHint = "Click for the whole list."
 L.AndMore = "and %d more"
 
 -- Options

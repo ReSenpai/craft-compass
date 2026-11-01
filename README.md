@@ -63,6 +63,8 @@ oil or a thread back to where it comes from.
 The same places show where an item comes from. A herb, an ore or a stone shows the profession that gathers it with
 the skill it needs and the zones where it grows most; leather and hides show the skinning skill they start at. Then
 who sells the item, which creatures drop it, what it is found in or contained in and which quest rewards it.
+In a pinned window each of these lines is clickable and opens the whole list: every vendor, every creature with
+its level and zone, every zone with how many herbs or veins it has.
 
 ### And also
 

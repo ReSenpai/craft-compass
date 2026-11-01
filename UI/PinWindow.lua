@@ -3,7 +3,8 @@ Pinned windows: what an item is used for, and for a crafted item what its craft 
 screen; reagents are rows like the rest, so they open in turn. Alt over an item opens one; Alt over a
 row of a window (or a right click on it) opens a nested window beside it, one level deeper.
 Rows are buttons: hover shows the row's tooltip, a click opens the item window, Shift-click
-links the item or quest in chat. Alt-click on an item link in chat opens a window too.
+links the item or quest in chat. Alt-click on an item link in chat opens a window too. A source
+row (sold by, drops from, zones...) opens the whole list in a nested window on a click.
 ]]
 local _, ns = ...
 local L, Util, Lines, Quests = ns.L, ns.Util, ns.Lines, ns.Quests
@@ -17,6 +18,8 @@ local PADDING = 12
 local SCROLLBAR_WIDTH = 16
 local RIGHT_TEXT_GAP = 16
 local MIN_WIDTH = 220
+-- Long rows (sources) wrap at this width unless the other rows make the window wider anyway.
+local WRAP_WIDTH = 320
 -- The tallest a window gets before its list scrolls, as a share of the screen.
 local MAX_HEIGHT_SHARE = 0.6
 
@@ -44,6 +47,10 @@ local function Row_OnEnter(row)
         end
         GameTooltip:AddLine(L.QuestLinkHint, 0.65, 0.65, 0.65)
         GameTooltip:Show()
+    elseif row.open then
+        GameTooltip:AddLine(row.open.label, 1, 0.82, 0)
+        GameTooltip:AddLine(L.OpenListHint, 0.65, 0.65, 0.65)
+        GameTooltip:Show()
     elseif row.link then
         -- Items get their extra lines from the tooltip hook; ns.Tooltip adds them to enchants.
         GameTooltip:SetHyperlink(Util.LinkData(row.link))
@@ -57,7 +64,9 @@ local function Row_OnLeave()
 end
 
 local function Row_OnClick(row, button)
-    if row.quest then
+    if row.open then
+        PinWindow.OpenList(row)
+    elseif row.quest then
         if IsModifiedClick("CHATLINK") then
             InsertChatLink(Quests.GetChatLink(row.quest))
         end
@@ -83,6 +92,13 @@ local function CreateRow(window, parent)
     row.right = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     row.right:SetPoint("RIGHT")
     row.right:SetJustifyH("RIGHT")
+    -- Long rows show their text here instead, wrapped at the window's width.
+    row.wrapText = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    row.wrapText:SetPoint("TOPLEFT", 0, -1)
+    row.wrapText:SetJustifyH("LEFT")
+    row.wrapText:SetJustifyV("TOP")
+    row.wrapText:SetWordWrap(true)
+    row.wrapText:Hide()
     -- Read by the tooltip hook to tell pinned rows from everything else.
     row.craftCompassLevel = window.level
     row:SetScript("OnEnter", Row_OnEnter)
@@ -197,20 +213,30 @@ local function Place(window)
     end
 end
 
+--- The width of a text on one line, even when the font string is narrower and wraps it.
+local function NaturalWidth(fontString)
+    local width = fontString.GetUnboundedStringWidth and fontString:GetUnboundedStringWidth()
+    return width or fontString:GetStringWidth()
+end
+
 local function Fill(window, lines)
     local width = window.title.text:GetStringWidth() + 30
-    local contentHeight = 0
+    local wrapWidth = 0
     local previous
     for i, line in ipairs(lines) do
         local row = GetRow(window, i)
         row.link = line.link
         row.quest = line.quest
-        row.text:SetText(line.spacer and "" or line.text)
-        row.text:SetTextColor(unpack(line.color or {1, 1, 1}))
+        row.open = line.open
+        row.wraps = line.wrap and not line.spacer
+        local text = row.wraps and row.wrapText or row.text
+        row.text:SetShown(not row.wraps)
+        row.wrapText:SetShown(row.wraps)
+        text:SetText(line.spacer and "" or line.text)
+        text:SetTextColor(unpack(line.color or {1, 1, 1}))
         row.right:SetText(line.right or "")
         row.right:SetTextColor(unpack(line.rightColor or {1, 1, 1}))
-        row:SetHeight(line.spacer and SPACER_HEIGHT or ROW_HEIGHT)
-        row:EnableMouse(line.link ~= nil or line.quest ~= nil)
+        row:EnableMouse(line.link ~= nil or line.quest ~= nil or line.open ~= nil)
         row:ClearAllPoints()
         if previous then
             row:SetPoint("TOPLEFT", previous, "BOTTOMLEFT")
@@ -218,47 +244,59 @@ local function Fill(window, lines)
             row:SetPoint("TOPLEFT")
         end
         row:Show()
-        local rowWidth = row.text:GetStringWidth()
-        if line.right then
-            rowWidth = rowWidth + RIGHT_TEXT_GAP + row.right:GetStringWidth()
+        if row.wraps then
+            wrapWidth = math.max(wrapWidth, NaturalWidth(row.wrapText))
+        else
+            local rowWidth = row.text:GetStringWidth()
+            if line.right then
+                rowWidth = rowWidth + RIGHT_TEXT_GAP + row.right:GetStringWidth()
+            end
+            width = math.max(width, rowWidth)
         end
-        width = math.max(width, rowWidth)
-        contentHeight = contentHeight + row:GetHeight()
         previous = row
     end
     for i = #lines + 1, #window.rows do
         window.rows[i]:Hide()
     end
+    -- Long rows get the width the rest needs, or up to WRAP_WIDTH, and wrap past it.
+    width = math.max(width, math.min(wrapWidth, WRAP_WIDTH))
     window.title:SetWidth(width)
-    for i = 1, #lines do
-        window.rows[i]:SetWidth(width)
+
+    local contentHeight = 0
+    for i, line in ipairs(lines) do
+        local row = window.rows[i]
+        row:SetWidth(width)
+        if row.wraps then
+            row.wrapText:SetWidth(width)
+            row:SetHeight(math.max(ROW_HEIGHT, math.ceil((row.wrapText:GetStringHeight() or 0) + 2)))
+        else
+            row:SetHeight(line.spacer and SPACER_HEIGHT or ROW_HEIGHT)
+        end
+        contentHeight = contentHeight + row:GetHeight()
     end
     return width, contentHeight
 end
 
 --[[
-Shows what the item behind a link is used for in the window at a level. A refresh redraws the
-window in place (names that have arrived since), keeping its position, scroll and nested windows.
+Shows content in the window at a level: {key, title, titleLink, build}, where title is a function
+returning the title text and build returns the lines and whether some names are still pending.
+The same content again keeps the window as it is. A refresh redraws the window in place (names
+that have arrived since), keeping its position, scroll and nested windows.
 ]]
-function PinWindow.Show(level, link, isRefresh)
-    local itemId = Util.ItemIdFromLink(link)
-    if not itemId then
-        return
-    end
+local function ShowContent(level, content, isRefresh)
     local window = windows[level] or CreateWindow(level)
-    -- Alt over the same item again: keep the window as it is.
-    if window:IsShown() and window.link == link and not isRefresh then
+    if window:IsShown() and window.view and window.view.key == content.key and not isRefresh then
         return
     end
     if not isRefresh and windows[level + 1] then
         windows[level + 1]:Hide()
     end
 
-    local lines, pending = Lines.ForWindow(itemId)
-    window.link = link
+    local lines, pending = content.build()
+    window.view = content
     window.pending = pending
-    window.title.link = link
-    window.title.text:SetText(link)
+    window.title.link = content.titleLink
+    window.title.text:SetText(content.title())
 
     local width, contentHeight = Fill(window, lines)
     local maxHeight = math.floor(UIParent:GetHeight() * MAX_HEIGHT_SHARE)
@@ -282,6 +320,42 @@ function PinWindow.Show(level, link, isRefresh)
     window:Raise()
 end
 
+--- Shows what the item behind a link takes, where it comes from and what it is used for.
+function PinWindow.Show(level, link, isRefresh)
+    local itemId = Util.ItemIdFromLink(link)
+    if not itemId then
+        return
+    end
+    ShowContent(level, {
+        key = link,
+        titleLink = link,
+        title = function ()
+            return link
+        end,
+        build = function ()
+            return Lines.ForWindow(itemId)
+        end
+    }, isRefresh)
+end
+
+--- Opens the whole list a source row stands for (all vendors, drops, zones...) one level deeper.
+function PinWindow.OpenList(row)
+    local open = row.open
+    local _, link = Util.GetItemInfo(open.itemId)
+    ShowContent(row.craftCompassLevel + 1, {
+        key = open.kind .. ":" .. open.itemId,
+        titleLink = link,
+        title = function ()
+            local _, itemLink = Util.GetItemInfo(open.itemId)
+            return open.label .. ": " .. (itemLink or ("#" .. open.itemId))
+        end,
+        build = function ()
+            local lines, pending = Lines.ForList(open)
+            return lines, pending or link == nil
+        end
+    })
+end
+
 --- Opens the item of a pinned row in a window one level deeper.
 function PinWindow.OpenNested(row)
     if row.link and not row.isTitle then
@@ -293,7 +367,7 @@ end
 function PinWindow.RefreshPending()
     for level, window in ipairs(windows) do
         if window:IsShown() and window.pending then
-            PinWindow.Show(level, window.link, true)
+            ShowContent(level, window.view, true)
         end
     end
 end

@@ -122,7 +122,15 @@ LibQuestieDB = {
         if id == 13463 and f == "objectDrops" then return {50, 60} end
         if id == 13463 and f == "npcDrops" then local t = {} for i = 1, 500 do t[i] = 1000 + i end return t end
     end},
-    Npc = {Get = function(id, f) if f == "name" then return "Npc" .. id end if f == "zoneID" then return 40 end if f == "friendlyToFaction" then return id == 1 and "H" or "A" end end},
+    Npc = {Get = function(id, f)
+        if f == "name" then return "Npc" .. id end
+        if f == "zoneID" then return id % 2 == 0 and 40 or 41 end
+        if f == "friendlyToFaction" then return id == 1 and "H" or "A" end
+        if f == "minLevel" then return 50 end
+        if f == "maxLevel" then return id % 3 == 0 and 52 or 50 end
+        -- Npc2 travels with the fair: spawn points in two zones
+        if f == "spawns" and id == 2 then return {[12] = {{41, 69}}, [40] = {{36, 38}}} end
+    end},
     Object = {
         GetAllIds = function() return {50, 60, 61} end,
         GetRaw = function(id, f) if f == "name" then return ({[50] = "Solid Chest", [60] = "Dreamfoil", [61] = "Dreamfoil"})[id] end end,
@@ -246,6 +254,35 @@ GameTooltip.scripts.OnTooltipSetItem(GameTooltip)
 for _, row in ipairs(CraftCompassWindow1.rows) do if row.link and row.link:find("item:2302") then row.scripts.OnClick(row, "LeftButton") end end
 p("row alt-click: window1 title=" .. tostring(CraftCompassWindow1.title.text.text) .. " window2 shown=" .. tostring(CraftCompassWindow2.shown))
 ALT = false
+
+-- A Dreamfoil window: its source rows open whole lists one level deeper
+CraftCompassWindow1:Hide()
+SHIFT, ALT = false, true
+GameTooltip.owner = UIParent
+GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(13463)
+GameTooltip.scripts.OnTooltipSetItem(GameTooltip)
+ALT = false
+for _, kind in ipairs({"npcDrops", "zones"}) do
+    for _, row in ipairs(CraftCompassWindow1.rows) do
+        if row.shown and row.open and row.open.kind == kind and row.wraps ~= nil then
+            row.scripts.OnEnter(row)
+            dump("hover " .. kind .. " row")
+            row.scripts.OnClick(row, "LeftButton")
+            break
+        end
+    end
+    local list = CraftCompassWindow2
+    local shown = 0
+    for _, row in ipairs(list.rows) do if row.shown then shown = shown + 1 end end
+    p(kind .. " list: shown=" .. tostring(list.shown) .. " title=" .. tostring(list.title.text.text) .. " rows=" .. shown)
+    for i = 1, 3 do
+        local row = list.rows[i]
+        p(string.format("  %s", row.text.text .. " | " .. row.right.text))
+    end
+end
+for _, row in ipairs(CraftCompassWindow1.rows) do
+    if row.shown and row.wraps then p("wrapped row: " .. row.wrapText.text .. " width=" .. tostring(row.wrapText.w)) end
+end
 
 FIRE("GET_ITEM_INFO_RECEIVED")
 FIRE("MODIFIER_STATE_CHANGED")

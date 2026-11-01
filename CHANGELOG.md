@@ -7,6 +7,11 @@ All notable changes to Craft Compass. The text of this file goes into each relea
 - Where an item comes from, with Shift, in pinned windows and in the item window: herbs, ore, stone, leather and
   hides show the gathering profession and the skill they need, and herbs and ore the zones they grow in. Any item
   shows who sells it, which creatures drop it, what it is found or contained in and which quest rewards it.
+- In a pinned window every source line opens the whole list in a nested window: all vendors (the other
+  faction's greyed out), all creatures with their level and zones, all objects, containers and quests, and every
+  zone with how many spawn points it has.
+- Long source lines wrap in pinned windows instead of making them wider and wider.
+- NPCs and objects show every zone they appear in, so the Darkmoon Faire's vendors show both of theirs.
 - Long drop lists no longer slow tooltips down: only the names shown are looked up.
 - The source lines of a recipe are no longer indented, which pushed them to the right.
 
