@@ -64,7 +64,7 @@ UnitClass = function() return "Warrior", "WARRIOR", 1 end
 UnitFactionGroup = function() return "Alliance" end
 GetNumSkillLines = function() return 1 end
 GetSkillLineInfo = function() return "Leatherworking" end
-local names = {[2318] = "Light Leather", [2320] = "Coarse Thread", [2302] = "Handstitched Leather Boots", [9999] = "Pattern: Boots"}
+local names = {[2318] = "Light Leather", [2320] = "Coarse Thread", [2302] = "Handstitched Leather Boots", [9999] = "Pattern: Boots", [13463] = "Dreamfoil"}
 GetItemInfo = function(id) if names[id] then return names[id], "|cffffffff|Hitem:" .. id .. "::::|h[" .. names[id] .. "]|h|r" end end
 GetItemIcon = function(id) return 134000 + id end
 GetItemCount = function(id) return id == 2318 and 5 or 0 end
@@ -115,9 +115,24 @@ local quests = {
 }
 LibQuestieDB = {
     Quest = {GetAllIds = function() return {100, 101, 102} end, Get = function(id, f) return quests[id] and quests[id][f] end},
-    Item = {Get = function(id, f) if id == 9999 and f == "vendors" then return {1, 2} end if id == 9999 and f == "npcDrops" then return {3, 4, 5} end end},
+    Item = {Get = function(id, f)
+        if id == 9999 and f == "vendors" then return {1, 2} end
+        if id == 9999 and f == "npcDrops" then return {3, 4, 5} end
+        -- Dreamfoil: a chest, a herb node and a long drop list
+        if id == 13463 and f == "objectDrops" then return {50, 60} end
+        if id == 13463 and f == "npcDrops" then local t = {} for i = 1, 500 do t[i] = 1000 + i end return t end
+    end},
     Npc = {Get = function(id, f) if f == "name" then return "Npc" .. id end if f == "zoneID" then return 40 end if f == "friendlyToFaction" then return id == 1 and "H" or "A" end end},
-    Object = {Get = function() end},
+    Object = {
+        GetAllIds = function() return {50, 60, 61} end,
+        GetRaw = function(id, f) if f == "name" then return ({[50] = "Solid Chest", [60] = "Dreamfoil", [61] = "Dreamfoil"})[id] end end,
+        Get = function(id, f)
+            if f == "name" then return ({[50] = "Solid Chest", [60] = "Dreamfoil", [61] = "Dreamfoil"})[id] end
+            if f == "zoneID" then return 16 end
+            if f == "spawns" and id == 60 then return {[16] = {{1, 1}, {2, 2}}, [361] = {{3, 3}}} end
+            if f == "spawns" and id == 61 then return {[361] = {{4, 4}, {5, 5}}, [490] = {{6, 6}, {7, 7}, {8, 8}}} end
+        end
+    },
 }
 """
 lua.execute(f"LOCALE = '{sys.argv[1] if len(sys.argv) > 1 else 'enUS'}'")
@@ -161,6 +176,11 @@ GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(2318)
 SHIFT, ALT = true, false
 GameTooltip.scripts.OnTooltipSetItem(GameTooltip)
 dump("shift over Light Leather")
+
+-- Shift over a herb: where it grows and the skill it needs, the chest but not the node, a short drop list
+GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(13463)
+GameTooltip.scripts.OnTooltipSetItem(GameTooltip)
+dump("shift over Dreamfoil")
 
 -- Shift over the boots: craft info and uses
 GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(2302)

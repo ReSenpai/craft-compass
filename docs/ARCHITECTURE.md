@@ -31,8 +31,9 @@ The files load in the order the TOC lists them. Each one is a module on the shar
 | `Locales/enUS.lua`, `ruRU.lua` | fills `ns.L` | The addon's own text. A missing key shows as the key itself. |
 | `Core/Util.lua` | `ns.Util` | Wrappers over the client API, `SafeCall`, link parsing, `RunInBackground`. |
 | `Sources/AtlasLoot.lua` | `ns.Crafts` | Crafts: reagent → craft spells, created item → craft spell, recipe items. |
-| `Sources/Questie.lua` | `ns.Quests` | Quests by item, quest/NPC/zone names, recipe sources, chat links. |
-| `Core/Lines.lua` | `ns.Lines` | Builds the lines: what an item is used for, what a craft takes. |
+| `Sources/Questie.lua` | `ns.Quests` | Quests by item, quest/NPC/zone names, item sources, chat links. |
+| `Sources/Gathering.lua` | `ns.Gathering` | Gathered resources: profession, skill, zones of their herbs and veins. |
+| `Core/Lines.lua` | `ns.Lines` | Builds the lines: what an item is used for, what a craft takes, where an item comes from. |
 | `UI/PinWindow.lua` | `ns.PinWindow` | Pinned windows, nested windows, chat Alt-click. |
 | `UI/Tooltip.lua` | `ns.Tooltip` | Tooltip hooks, modifier keys, redrawing when names arrive. |
 | `Core/Options.lua` | — | Options panel and `/craftcompass`, `/ccompass`. |
@@ -41,6 +42,8 @@ The files load in the order the TOC lists them. Each one is a module on the shar
 flowchart TD
     AL[(AtlasLoot Classic)] --> Crafts[Sources/AtlasLoot.lua<br>ns.Crafts]
     QDB[(QuestieDB)] --> Quests[Sources/Questie.lua<br>ns.Quests]
+    Quests --> Gathering[Sources/Gathering.lua<br>ns.Gathering]
+    Gathering --> Lines
     Crafts --> Lines[Core/Lines.lua<br>ns.Lines]
     Quests --> Lines
     Settings[Core/Init.lua<br>ns.settings] --> Lines
@@ -58,13 +61,14 @@ flowchart TD
    missing keys (`onlyMyProfessions = false`, `showCompletedQuests = true`, `showNotUsed = true`).
 2. `PLAYER_LOGIN`: every callback registered with `ns.OnLogin` runs, in load order. By then all addons, AtlasLoot
    and QuestieDB included, are loaded.
-   - `Crafts` and `Quests` start building their indexes in the background, if their source addon is there.
+   - `Crafts`, `Quests` and `Gathering` start building their indexes in the background, if their source addon is
+     there.
    - `Tooltip` hooks `GameTooltip` and `ItemRefTooltip`.
    - `Options` registers the options panel and the slash commands.
 
 `Util.RunInBackground(work)` runs `work` as a coroutine, resumed once per frame by `C_Timer.NewTicker(0)`. `work`
 yields every so often. It returns a *finish* function that runs the rest at once. `Crafts.ForReagent`,
-`Crafts.ForCreatedItem` and `Quests.ForItem` call it first, so a tooltip shown right after login is still complete.
+`Crafts.ForCreatedItem`, `Quests.ForItem` and the `Gathering` lookups call it first, so a tooltip shown right after login is still complete.
 
 ## Data sources
 
@@ -98,12 +102,27 @@ step. It takes items from:
 `Quests.IsForPlayer` checks `requiredRaces` and `requiredClasses`, bit masks with the flag `2^(id-1)`. They are
 checked with arithmetic: Lua 5.1 has no bit operators, and the client's `bit.band` stops at 32 bits.
 
-QuestieDB also provides recipe sources (`Item` fields `vendors`, `npcDrops`, `objectDrops`, `questRewards`), NPC
+QuestieDB also provides where items come from (`Item` fields `vendors`, `npcDrops`, `objectDrops`, `itemDrops`, `questRewards`), NPC
 faction (`friendlyToFaction`: `"A"`, `"H"`, `"AH"`) and zones (`zoneID`, `zoneOrSort`, named through
 `C_Map.GetAreaInfo`).
 
-Without QuestieDB there are no quests, and recipes are shown without their sources. Calls into other addons go
+Without QuestieDB there are no quests, and items and recipes are shown without their sources. Calls into other addons go
 through `Util.SafeCall`, so a change in their API doesn't break tooltips.
+
+### Gathering (`Sources/Gathering.lua`)
+
+Neither AtlasLoot nor QuestieDB knows which skill a herb, a vein or a hide needs, so this is the one table of game
+facts the addon keeps itself:
+
+- `NODES` — herbs and veins by their English name: profession and skill (Dreamfoil → Herbalism 270);
+- `ITEM_NODES` — which of them each resource comes from (Thorium Ore and Dense Stone → the four thorium veins);
+- `SKINNED` — leather and hides with the skinning skill beasts start to give them at.
+
+QuestieDB has the herbs and veins as objects with their spawn points, but doesn't link herbs to the items they
+give. So after login the index goes over every object once (250 per step) and keeps those whose raw name
+(`Object.GetRaw`, English on every client) is in `NODES`. `Gathering.GetZones` adds up their spawn points by zone
+and sorts the zones, most points first. `Gathering.IsNode` lets the sources leave the veins out of "found in",
+since the gathering line covers them.
 
 ## The line model (`Core/Lines.lua`)
 
@@ -127,8 +146,12 @@ Builders return `lines, pending`, where `pending` means some item names weren't 
 - `Lines.ForCraft(spellId)` — profession and skill, each reagent with *have/need* (bags and bank, green when enough),
   then the recipe: "trainer", or the recipe item with up to two vendors (the player's faction first), drops,
   containers and quest rewards, plus "and N more".
-- `Lines.ForWindow(itemId)` — for a pinned window: `ForCraft` of the item's craft, if it is crafted, followed by
-  `ForItemUses`. Reagents are ordinary rows with links, so they open like any other item.
+- `Lines.ForSources(itemId)` — "where to get": the gathering profession with its skill and the top three zones,
+  then vendors, drops, objects, containers and quest rewards from QuestieDB. Each list names two and adds
+  "and N more"; names are looked up only for those two, since cloth drops from hundreds of NPCs.
+- `Lines.ForOrigin(itemId)` — `ForCraft` of the item's craft, if it is crafted, followed by `ForSources`.
+- `Lines.ForWindow(itemId)` — for a pinned window: `ForOrigin`, then `ForItemUses`. Reagents are ordinary rows
+  with links, so they open like any other item.
 - `Lines.AddToTooltip(tooltip, lines)` — draws lines with `AddLine` / `AddDoubleLine`.
 
 ## Tooltips (`UI/Tooltip.lua`)
@@ -139,13 +162,13 @@ other tooltips are left alone. `TooltipDataProcessor` is used only on a client w
 
 What gets added:
 
-| Situation | Craft (`ForCraft`) | Uses (`ForItemUses`) | Other |
+| Situation | Craft and sources (`ForOrigin`) | Uses (`ForItemUses`) | Other |
 | --- | --- | --- | --- |
 | Hover, no modifier | — | — | — |
-| Hover with **Shift** or **Ctrl** | if crafted | yes | — |
+| Hover with **Shift** or **Ctrl** | yes | yes | — |
 | Hover with **Alt** | — | — | opens pinned window, level 1 |
-| Hover a row of a pinned window | if crafted | with Shift | Alt opens a nested window |
-| Item window (`ItemRefTooltip`) | if crafted | — | hint: Alt-click the link to pin it |
+| Hover a row of a pinned window | yes | with Shift | Alt opens a nested window |
+| Item window (`ItemRefTooltip`) | yes | — | for a crafted item, hint: Alt-click the link to pin it |
 
 - **Modifier keys:** `MODIFIER_STATE_CHANGED` calls the `OnEnter` of the hovered tooltip's owner again. Pressing or
   releasing Shift or Alt over an item then redraws without moving the mouse.
@@ -213,7 +236,7 @@ sequenceDiagram
     L->>Cr: ForCreatedItem, Get, GetRecipeItem, ForReagent, ForItem
     Cr-->>L: craft spell, reagents, recipe, quests
     L-->>W: lines (+ pending)
-    W-->>P: window 1: leather, reagents, recipe, uses
+    W-->>P: window 1: armour, reagents, recipe, uses
     P->>W: right click on Shadow Oil
     W->>L: ForWindow(Shadow Oil)
     W-->>P: window 2 beside it: what the oil takes and where its recipe is

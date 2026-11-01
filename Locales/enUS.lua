@@ -14,6 +14,9 @@ L.SoldBy = "Sold by"
 L.DropsFrom = "Drops from"
 L.FoundIn = "Found in"
 L.QuestReward = "Quest reward"
+L.ContainedIn = "Contained in"
+L.WhereToGet = "Where to get"
+L.Zones = "Zones"
 L.AndMore = "and %d more"
 
 -- Options

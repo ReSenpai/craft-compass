@@ -58,6 +58,12 @@ oil or a thread back to where it comes from.
 
 ![The item window of Swiftness Potion: alchemy, its reagents and where the recipe is found](docs/images/item-window.png)
 
+### Where to get it
+
+The same places show where an item comes from. A herb, an ore or a stone shows the profession that gathers it with
+the skill it needs and the zones where it grows most; leather and hides show the skinning skill they start at. Then
+who sells the item, which creatures drop it, what it is found in or contained in and which quest rewards it.
+
 ### And also
 
 - **Quests in chat.** Shift-click a quest in a pinned window to link it in chat, in the `[Name (id)]` form Questie

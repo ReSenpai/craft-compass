@@ -13,7 +13,7 @@ Builders return the lines and whether some item names weren't cached yet, in whi
 caller draws them again once GET_ITEM_INFO_RECEIVED brings them.
 ]]
 local _, ns = ...
-local L, Util, Crafts, Quests = ns.L, ns.Util, ns.Crafts, ns.Quests
+local L, Util, Crafts, Quests, Gathering = ns.L, ns.Util, ns.Crafts, ns.Quests, ns.Gathering
 
 local Lines = {}
 ns.Lines = Lines
@@ -22,8 +22,9 @@ local HEADER_COLOR = {0.31, 0.52, 0.83}
 local MUTED_COLOR = {0.65, 0.65, 0.65}
 local ENOUGH_COLOR = {0.1, 1, 0.1}
 local QUEST_ICON = "Interface\\GossipFrame\\AvailableQuestIcon"
--- How many vendors, drops and so on a recipe source line names before "and N more".
+-- How many vendors, drops and so on a source line names before "and N more".
 local SOURCES_SHOWN = 2
+local ZONES_SHOWN = 3
 
 --- The link and icon of what a craft makes: its item, or the spell itself for enchants.
 local function GetCraftResult(spellId, craft)
@@ -137,65 +138,98 @@ function Lines.ForItemUses(itemId)
     return lines, pending
 end
 
-local function JoinNames(names)
-    local shown = {}
-    for i = 1, math.min(#names, SOURCES_SHOWN) do
-        shown[i] = names[i]
-    end
-    local text = table.concat(shown, ", ")
-    if #names > SOURCES_SHOWN then
-        text = text .. " " .. string.format(L.AndMore, #names - SOURCES_SHOWN)
-    end
-    return text
-end
-
-local function PlaceNames(entity, ids, filter)
-    local names = {}
+--[[
+The first few names out of a list of ids, and how many ids pass the filter in all. Drop lists run
+to hundreds of NPCs (cloth), so names are looked up only for the ones shown.
+]]
+local function FirstNames(ids, getName, filter, shown)
+    local names, total = {}, 0
     for _, id in ipairs(type(ids) == "table" and ids or {}) do
         if not filter or filter(id) then
-            local name = Quests.GetPlaceName(entity, id)
-            if name then
-                table.insert(names, name)
+            total = total + 1
+            if #names < (shown or SOURCES_SHOWN) then
+                table.insert(names, getName(id))
             end
         end
     end
-    return names
+    return names, total
 end
 
---- Where a recipe item comes from: vendors, drops, containers and quest rewards.
-local function AddRecipeSources(lines, recipeId)
+--- A label and "a, b and N more" in one line.
+local function AddNamesLine(lines, label, names, total)
+    if #names == 0 then
+        return
+    end
+    local text = table.concat(names, ", ")
+    if total > #names then
+        text = text .. " " .. string.format(L.AndMore, total - #names)
+    end
+    table.insert(lines, {text = label .. ": |cffffffff" .. text .. "|r", color = MUTED_COLOR, wrap = true})
+end
+
+local function NpcName(npcId)
+    return Quests.GetPlaceName("Npc", npcId) or ("#" .. npcId)
+end
+
+local function ObjectName(objectId)
+    return Quests.GetPlaceName("Object", objectId) or ("#" .. objectId)
+end
+
+local function ItemName(itemId)
+    return Quests.Get("Item", itemId, "name") or Util.GetItemInfo(itemId) or ("#" .. itemId)
+end
+
+--[[
+Where an item comes from in QuestieDB: vendors, drops, objects, containers and quest rewards.
+Herbs and veins are left to the gathering line. Returns whether it added anything.
+]]
+local function AddSources(lines, itemId)
+    local count = #lines
     local factionLetter = UnitFactionGroup("player") == "Horde" and "H" or "A"
-    local vendorIds = Quests.Get("Item", recipeId, "vendors")
+    local vendorIds = Quests.Get("Item", itemId, "vendors")
     -- Vendors the character can buy from first; the others rather than nothing.
-    local vendors = PlaceNames("Npc", vendorIds, function (npcId)
+    local vendors, vendorCount = FirstNames(vendorIds, NpcName, function (npcId)
         local friendly = Quests.Get("Npc", npcId, "friendlyToFaction")
         return type(friendly) ~= "string" or friendly:find(factionLetter) ~= nil
     end)
-    if #vendors == 0 then
-        vendors = PlaceNames("Npc", vendorIds)
+    if vendorCount == 0 then
+        vendors, vendorCount = FirstNames(vendorIds, NpcName)
     end
+    AddNamesLine(lines, L.SoldBy, vendors, vendorCount)
+    AddNamesLine(lines, L.DropsFrom, FirstNames(Quests.Get("Item", itemId, "npcDrops"), NpcName))
+    AddNamesLine(lines, L.FoundIn, FirstNames(Quests.Get("Item", itemId, "objectDrops"), ObjectName, function (objectId)
+        return not Gathering.IsNode(objectId)
+    end))
+    AddNamesLine(lines, L.ContainedIn, FirstNames(Quests.Get("Item", itemId, "itemDrops"), ItemName))
+    AddNamesLine(lines, L.QuestReward, FirstNames(Quests.Get("Item", itemId, "questRewards"), Quests.GetName))
+    return #lines > count
+end
 
-    local questNames = {}
-    local rewardIds = Quests.Get("Item", recipeId, "questRewards")
-    for _, questId in ipairs(type(rewardIds) == "table" and rewardIds or {}) do
-        table.insert(questNames, Quests.GetName(questId))
+local function ZoneName(zoneId)
+    local name = C_Map and C_Map.GetAreaInfo and C_Map.GetAreaInfo(zoneId)
+    if name and name ~= "" then
+        return name
     end
+    return "#" .. zoneId
+end
 
-    local sources = {
-        {L.SoldBy, vendors},
-        {L.DropsFrom, PlaceNames("Npc", Quests.Get("Item", recipeId, "npcDrops"))},
-        {L.FoundIn, PlaceNames("Object", Quests.Get("Item", recipeId, "objectDrops"))},
-        {L.QuestReward, questNames}
-    }
-    for _, source in ipairs(sources) do
-        if #source[2] > 0 then
-            table.insert(lines, {
-                text = "   " .. source[1] .. ": |cffffffff" .. JoinNames(source[2]) .. "|r",
-                color = MUTED_COLOR,
-                wrap = true
-            })
-        end
+--[[
+Where an item comes from: the profession that gathers it with the skill it needs and the zones it
+grows in, then vendors, drops and the rest. Nil when nothing is known.
+]]
+function Lines.ForSources(itemId)
+    local lines = {{spacer = true}, {text = L.WhereToGet, color = HEADER_COLOR}}
+    local professionId, skill = Gathering.Get(itemId)
+    local name, icon = Crafts.GetProfession(professionId)
+    if name then
+        table.insert(lines, {text = Util.Icon(icon) .. name .. " (" .. skill .. ")"})
+        local zones = Gathering.GetZones(itemId)
+        AddNamesLine(lines, L.Zones, FirstNames(zones, ZoneName, nil, ZONES_SHOWN))
     end
+    if not AddSources(lines, itemId) and not name then
+        return nil
+    end
+    return lines
 end
 
 --[[
@@ -237,7 +271,7 @@ function Lines.ForCraft(spellId)
         local _, recipeLink = Util.GetItemInfo(recipeId)
         pending = pending or recipeLink == nil
         table.insert(lines, {text = L.Recipe .. ": " .. (recipeLink or "..."), color = MUTED_COLOR, link = recipeLink})
-        AddRecipeSources(lines, recipeId)
+        AddSources(lines, recipeId)
     else
         table.insert(lines, {text = L.Recipe .. ": |cffffffff" .. L.Trainer .. "|r", color = MUTED_COLOR})
     end
@@ -245,23 +279,42 @@ function Lines.ForCraft(spellId)
 end
 
 --[[
-A pinned window's lines: what the item's craft takes, if it is crafted, so its reagents can be
-opened in turn, then what the item is used for.
+What an item takes and where it comes from: its craft, if it is crafted, then its sources. Nil
+when there is neither.
+]]
+function Lines.ForOrigin(itemId)
+    local lines, pending = {}, false
+    local spellId = Crafts.ForCreatedItem(itemId)
+    if spellId then
+        local craftLines, craftPending = Lines.ForCraft(spellId)
+        for _, line in ipairs(craftLines or {}) do
+            table.insert(lines, line)
+        end
+        pending = craftPending
+    end
+    for _, line in ipairs(Lines.ForSources(itemId) or {}) do
+        table.insert(lines, line)
+    end
+    if #lines == 0 then
+        return nil, false
+    end
+    return lines, pending
+end
+
+--[[
+A pinned window's lines: what the item's craft takes and where the item comes from, so its
+reagents can be opened in turn, then what the item is used for.
 ]]
 function Lines.ForWindow(itemId)
-    local lines, pending = Lines.ForItemUses(itemId)
-    local spellId = Crafts.ForCreatedItem(itemId)
-    local craftLines, craftPending
-    if spellId then
-        craftLines, craftPending = Lines.ForCraft(spellId)
+    local lines, pending = Lines.ForOrigin(itemId)
+    local useLines, usePending = Lines.ForItemUses(itemId)
+    if not lines then
+        return useLines, usePending
     end
-    if not craftLines then
-        return lines, pending
+    for _, line in ipairs(useLines) do
+        table.insert(lines, line)
     end
-    for _, line in ipairs(lines) do
-        table.insert(craftLines, line)
-    end
-    return craftLines, pending or craftPending
+    return lines, pending or usePending
 end
 
 --- Draws lines into a tooltip.

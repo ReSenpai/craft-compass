@@ -2,6 +2,14 @@
 
 All notable changes to Craft Compass. The text of this file goes into each release's notes.
 
+## 0.3.0 — 2026-11-01
+
+- Where an item comes from, with Shift, in pinned windows and in the item window: herbs, ore, stone, leather and
+  hides show the gathering profession and the skill they need, and herbs and ore the zones they grow in. Any item
+  shows who sells it, which creatures drop it, what it is found or contained in and which quest rewards it.
+- Long drop lists no longer slow tooltips down: only the names shown are looked up.
+- The source lines of a recipe are no longer indented, which pushed them to the right.
+
 ## 0.2.0 — 2026-10-31
 
 - Alt-click on an item link in chat (or anywhere else a link opens the item window) pins it into a window.

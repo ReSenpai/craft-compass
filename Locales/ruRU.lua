@@ -17,6 +17,9 @@ L.SoldBy = "Продаёт"
 L.DropsFrom = "Падает с"
 L.FoundIn = "Лежит в"
 L.QuestReward = "Награда за задание"
+L.ContainedIn = "Внутри"
+L.WhereToGet = "Где взять"
+L.Zones = "Зоны"
 L.AndMore = "и ещё %d"
 
 -- Настройки

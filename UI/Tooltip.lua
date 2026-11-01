@@ -1,7 +1,7 @@
 --[[
 Item tooltips. Shift (or Ctrl) adds what the item is used for, Alt pins that into a window
-instead. A craftable item also gets what its craft takes: with Shift, on rows of pinned windows,
-and always in the item window a click on a link opens.
+instead. What the item's craft takes and where the item comes from are added with Shift, on rows
+of pinned windows, and always in the item window a click on a link opens.
 ]]
 local _, ns = ...
 local L, Util, Lines, Crafts, PinWindow = ns.L, ns.Util, ns.Lines, ns.Crafts, ns.PinWindow
@@ -55,12 +55,13 @@ local function OnTooltipSetItem(tooltip)
     local added, isPending = false, false
 
     if isItemWindow or row or shift then
-        local spellId = Crafts.ForCreatedItem(itemId)
-        if spellId then
-            isPending = AddCraft(tooltip, spellId)
+        local lines, originPending = Lines.ForOrigin(itemId)
+        if lines then
+            Lines.AddToTooltip(tooltip, lines)
+            isPending = originPending
             added = true
             -- Reagents can't be clicked in the item window; a pinned window lets them be opened.
-            if isItemWindow then
+            if isItemWindow and Crafts.ForCreatedItem(itemId) then
                 tooltip:AddLine(L.PinLinkHint, 0.65, 0.65, 0.65, true)
             end
         end
