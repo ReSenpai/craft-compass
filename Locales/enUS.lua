@@ -4,7 +4,6 @@ local L = ns.L
 -- Tooltips and pinned windows
 L.Quests = "Quests"
 L.Completed = "completed"
-L.NotUsed = "Not used in any recipe or quest."
 L.QuestLevel = "Level %d"
 L.QuestLinkHint = "Shift-click to link in chat."
 L.PinLinkHint = "Alt-click the link to pin it: the reagents open from there."
@@ -28,5 +27,3 @@ L.OnlyMyProfessions = "Only my professions"
 L.OnlyMyProfessionsDesc = "Show recipes only for the professions this character has."
 L.ShowCompletedQuests = "Show completed quests"
 L.ShowCompletedQuestsDesc = "List quests this character has already completed (marked as such)."
-L.ShowNotUsed = "Show \"not used\" line"
-L.ShowNotUsedDesc = "Say so when an item isn't used in any recipe or quest."

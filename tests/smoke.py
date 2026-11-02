@@ -182,7 +182,7 @@ local function dump(title) p("--- " .. title); for _, l in ipairs(TOOLTIP_LINES)
 
 FIRE("ADDON_LOADED", "CraftCompass")
 FIRE("PLAYER_LOGIN")
-p("settings.showNotUsed=" .. tostring(ns.settings.showNotUsed) .. " db=" .. tostring(CraftCompassDB ~= nil))
+p("settings.showCompletedQuests=" .. tostring(ns.settings.showCompletedQuests) .. " db=" .. tostring(CraftCompassDB ~= nil))
 p("slash=" .. tostring(SLASH_CRAFTCOMPASS1)); SlashCmdList.CRAFTCOMPASS(""); p("opened=" .. tostring(OPENED))
 
 p("ForReagent(2318) = " .. #ns.Crafts.ForReagent(2318) .. " ForCreatedItem(2302) = " .. tostring(ns.Crafts.ForCreatedItem(2302)))

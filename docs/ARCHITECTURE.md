@@ -58,7 +58,7 @@ flowchart TD
 ## Start-up
 
 1. `ADDON_LOADED` for Craft Compass: the saved variable `CraftCompassDB` becomes `ns.settings`, with defaults for
-   missing keys (`onlyMyProfessions = false`, `showCompletedQuests = true`, `showNotUsed = true`).
+   missing keys (`onlyMyProfessions = false`, `showCompletedQuests = true`).
 2. `PLAYER_LOGIN`: every callback registered with `ns.OnLogin` runs, in load order. By then all addons, AtlasLoot
    and QuestieDB included, are loaded.
    - `Crafts`, `Quests` and `Gathering` start building their indexes in the background, if their source addon is
@@ -149,7 +149,7 @@ Builders return `lines, pending`, where `pending` means some item names weren't 
 
 - `Lines.ForItemUses(itemId)` — the recipes the item goes into, grouped by profession (sorted by name), each sorted by
   skill, with the reagent count. Then the quests that ask for it, for this race and class, sorted by level, completed
-  ones marked. Settings filter both. When there is nothing, it adds the "not used" line.
+  ones marked. Settings filter both. When there is nothing, it says nothing: the sources don't know every use.
 - `Lines.ForCraft(spellId)` — profession and skill, each reagent with *have/need* (bags and bank, green when enough),
   then the recipe: "trainer", or the recipe item with up to two vendors (the player's faction first) and quest
   rewards, plus "and N more".

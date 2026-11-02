@@ -128,15 +128,14 @@ local function AddQuestUses(lines, itemId)
     return true
 end
 
---- What an item is used for: the recipes it goes into and the quests that ask for it.
+--[[
+What an item is used for: the recipes it goes into and the quests that ask for it. Nothing found
+says nothing: the sources don't know every use, so "not used" would be a guess.
+]]
 function Lines.ForItemUses(itemId)
     local lines = {}
-    local hasRecipes, pending = AddRecipeUses(lines, itemId)
-    local hasQuests = AddQuestUses(lines, itemId)
-    if not hasRecipes and not hasQuests and ns.settings.showNotUsed then
-        table.insert(lines, {spacer = true})
-        table.insert(lines, {text = L.NotUsed, color = MUTED_COLOR})
-    end
+    local _, pending = AddRecipeUses(lines, itemId)
+    AddQuestUses(lines, itemId)
     return lines, pending
 end
 

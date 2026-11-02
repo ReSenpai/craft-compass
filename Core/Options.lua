@@ -24,8 +24,7 @@ local options = {
     args = {
         help = {order = 0, type = "description", fontSize = "medium", name = L.OptionsHelp .. "\n"},
         onlyMyProfessions = Toggle(1, "onlyMyProfessions", L.OnlyMyProfessions, L.OnlyMyProfessionsDesc),
-        showCompletedQuests = Toggle(2, "showCompletedQuests", L.ShowCompletedQuests, L.ShowCompletedQuestsDesc),
-        showNotUsed = Toggle(3, "showNotUsed", L.ShowNotUsed, L.ShowNotUsedDesc)
+        showCompletedQuests = Toggle(2, "showCompletedQuests", L.ShowCompletedQuests, L.ShowCompletedQuestsDesc)
     }
 }
 

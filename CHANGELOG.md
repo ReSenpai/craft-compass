@@ -7,7 +7,9 @@ All notable changes to Craft Compass. The text of this file goes into each relea
 - No more "Drops from", "Found in" and "Contained in" lines. Outside quest items, the data behind them comes from
   private-server databases and was too often wrong (rogue quest mobs "dropping" herbs). Where to get an item now
   shows the gathering profession and zones, vendors and quest rewards.
-- Instead, the last row of a pinned window is the item's Wowhead page: click it to get the address, selected for
+- No more "Not used in any recipe or quest" line and its setting: the sources don't know every use, so it was a
+  guess.
+- Instead of drops, the last row of a pinned window is the item's Wowhead page: click it to get the address, selected for
   Ctrl+C, on the site of your game version and in your client's language.
 - Herbs and ores show every zone they grow in. Questie clears the spawn points of the most common herbs and veins
   (Peacebloom, Briarthorn, copper, tin, iron...), so only a zone or two used to show.

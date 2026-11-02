@@ -14,9 +14,7 @@ local defaults = {
     -- Recipes only for the professions the character has.
     onlyMyProfessions = false,
     -- Quests the character has already completed.
-    showCompletedQuests = true,
-    -- A line saying the item isn't used anywhere.
-    showNotUsed = true
+    showCompletedQuests = true
 }
 
 -- Read through ns.settings.<name>: the table is replaced once the saved variables are loaded.
