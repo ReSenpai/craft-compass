@@ -17,7 +17,7 @@ L.ZonesOrder = "The zones where they grow most come first."
 L.OpenListHint = "Click for the whole list."
 L.WowheadPage = "Wowhead page"
 L.CopyUrlClickHint = "Click to copy the address."
-L.CopyUrlHint = "Press Ctrl+C to copy the address, then paste it into your browser."
+L.CopyUrlHint = "Press Ctrl+C: the address is copied and this window closes. Then paste it into your browser."
 L.AndMore = "and %d more"
 
 -- Options

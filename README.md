@@ -66,8 +66,8 @@ whole list: every vendor with their level and zone, every zone, the richest firs
 
 Craft Compass is a compass: it points you the right way, it isn't a database. It doesn't say which creatures drop an
 item or which chests it is found in: the data addons have on that comes from private-server databases and is too
-often wrong. For that, the last row of a pinned window is the item's Wowhead page: click it and copy the address with
-Ctrl+C (addons can't open a browser).
+often wrong. For that, the last row of a pinned window is the item's Wowhead page: click it and press Ctrl+C: the address
+is copied and the dialog closes (addons can't open a browser or copy by themselves).
 
 ### And also
 

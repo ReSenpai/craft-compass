@@ -216,7 +216,8 @@ What a row does:
 
 A source row (zones, sold by, quest reward) shows a hint on hover and opens its
 whole list one level deeper on any click. The Wowhead row opens a `StaticPopup` with the address selected for
-Ctrl+C: addons can't open a browser, and the edit box puts the address back if it is typed over.
+Ctrl+C: addons can't open a browser, and `CopyToClipboard` is protected. The edit box puts the address back if it
+is typed over, and Ctrl+C closes the popup the next frame, once the text is copied.
 
 **Items from chat:** `hooksecurefunc("SetItemRef", ...)` sees every link click: chat, quest log and anything else
 that goes through `SetItemRef`. With Alt held on an `item:` link, the addon opens a level 1 window for it and

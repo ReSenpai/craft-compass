@@ -38,6 +38,20 @@ StaticPopupDialogs.CRAFTCOMPASS_COPY_URL = {
         editBox:SetText(url)
         editBox:HighlightText()
         editBox:SetFocus()
+        -- Ctrl+C (Cmd+C on a Mac) closes the dialog once the address is copied. Popups share their
+        -- edit boxes, so the hook is added once and checks which dialog it is in.
+        if not editBox.craftCompassCopyHook then
+            editBox.craftCompassCopyHook = true
+            editBox:HookScript("OnKeyDown", function (_, key)
+                local copying = key == "C" and (IsControlKeyDown() or (IsMetaKeyDown and IsMetaKeyDown()))
+                if copying and dialog.which == "CRAFTCOMPASS_COPY_URL" then
+                    -- The next frame, after the edit box has copied the text.
+                    C_Timer.After(0, function ()
+                        StaticPopup_Hide("CRAFTCOMPASS_COPY_URL")
+                    end)
+                end
+            end)
+        end
     end,
     -- The address is there to be copied, not edited.
     EditBoxOnTextChanged = function (editBox, url)
