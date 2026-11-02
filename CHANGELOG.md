@@ -9,10 +9,12 @@ All notable changes to Craft Compass. The text of this file goes into each relea
   shows the gathering profession and zones, vendors and quest rewards.
 - No more "Not used in any recipe or quest" line and its setting: the sources don't know every use, so it was a
   guess.
-- Instead of drops, the last row of a pinned window is the item's Wowhead page: click it to get the address, selected for
-  Ctrl+C, on the site of your game version and in your client's language.
+- Instead of drops, the last row of a pinned window is the item's Wowhead page: click it to get the address,
+  selected for Ctrl+C, on the site of your game version and in your client's language.
 - Herbs and ores show every zone they grow in. Questie clears the spawn points of the most common herbs and veins
   (Peacebloom, Briarthorn, copper, tin, iron...), so only a zone or two used to show.
+- The list of zones no longer shows how many spawn points each has: the numbers come from private-server data and
+  don't match the live realms. The richest zones still come first.
 
 ## 0.3.0 — 2026-11-01
 

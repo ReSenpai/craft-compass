@@ -62,7 +62,7 @@ oil or a thread back to where it comes from.
 The same places show where an item comes from. A herb, an ore or a stone shows the profession that gathers it with
 the skill it needs and the zones where it grows most; leather and hides show the skinning skill they start at. Then
 who sells the item and which quest rewards it. In a pinned window each of these lines is clickable and opens the
-whole list: every vendor with their level and zone, every zone with how many herbs or veins it has.
+whole list: every vendor with their level and zone, every zone, the richest first.
 
 Craft Compass is a compass: it points you the right way, it isn't a database. It doesn't say which creatures drop an
 item or which chests it is found in: the data addons have on that comes from private-server databases and is too

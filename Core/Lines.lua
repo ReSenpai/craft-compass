@@ -300,10 +300,9 @@ these lists name NPCs, quests and zones).
 function Lines.ForList(open)
     local lines, pending = {}, false
     if open.kind == "zones" then
-        local zones, counts = Gathering.GetZones(open.itemId)
-        table.insert(lines, {text = L.NodesPerZone, color = MUTED_COLOR})
-        for _, zoneId in ipairs(zones) do
-            table.insert(lines, {text = ZoneName(zoneId), right = tostring(counts[zoneId]), rightColor = MUTED_COLOR})
+        table.insert(lines, {text = L.ZonesOrder, color = MUTED_COLOR})
+        for _, zoneId in ipairs(Gathering.GetZones(open.itemId)) do
+            table.insert(lines, {text = ZoneName(zoneId)})
         end
         return lines, pending
     end

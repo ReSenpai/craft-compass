@@ -126,7 +126,8 @@ facts the addon keeps itself:
 QuestieDB has the herbs and veins as objects with their spawn points, but doesn't link herbs to the items they
 give. So after login the index goes over every object once (250 per step) and keeps those whose raw name
 (`Object.GetRaw`, English on every client) is in `NODES`. `Gathering.GetZones` adds up their spawn points by zone
-and sorts the zones, most points first. The spawn points are read with `GetRaw` too: Questie's corrections clear
+and sorts the zones, most points first; the counts only set the order and are not shown, since they come from an
+emulator's database and don't match the live realms. The spawn points are read with `GetRaw` too: Questie's corrections clear
 them for the 24 most common herbs and veins (Briarthorn, copper...), which it never draws on the map.
 
 ## The line model (`Core/Lines.lua`)
@@ -157,7 +158,7 @@ Builders return `lines, pending`, where `pending` means some item names weren't 
   then vendors and quest rewards from QuestieDB. Each list names two and adds "and N more"; names are looked up
   only for those two.
 - `Lines.ForList(open)` — the whole list behind a source line: vendors (the other faction last, greyed out),
-  quests, or zones with their spawn points.
+  quests, or every zone, the richest first.
 - `Lines.ForOrigin(itemId)` — `ForCraft` of the item's craft, if it is crafted, followed by `ForSources`.
 - `Lines.ForWindow(itemId)` — for a pinned window: `ForOrigin`, then `ForItemUses`, then the item's Wowhead page
   (`Util.WowheadItemUrl`: `classic` or `tbc` by the client's interface version, and its language folder). Reagents

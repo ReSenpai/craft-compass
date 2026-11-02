@@ -216,16 +216,16 @@ function Gathering.Get(itemId)
 end
 
 --[[
-The zones where an item's herbs or veins grow, the ones with the most of them first, and how many
-spawn points each zone has.
+The zones where an item's herbs or veins grow, the ones with the most spawn points first. The
+counts themselves come from an emulator's database and are not shown, only the order.
 ]]
 function Gathering.GetZones(itemId)
     local nodes = ITEM_NODES[itemId]
     if not nodes or not Quests.IsAvailable() then
-        return {}, {}
+        return {}
     end
     if zonesByItem[itemId] then
-        return unpack(zonesByItem[itemId])
+        return zonesByItem[itemId]
     end
     EnsureIndex()
     -- Questie clears the spawns of the most common herbs and veins (it never draws them on the
@@ -251,8 +251,8 @@ function Gathering.GetZones(itemId)
         end
         return a < b
     end)
-    zonesByItem[itemId] = {zones, counts}
-    return zones, counts
+    zonesByItem[itemId] = zones
+    return zones
 end
 
 ns.OnLogin(function ()
