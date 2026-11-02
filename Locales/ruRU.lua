@@ -22,6 +22,9 @@ L.WhereToGet = "Где взять"
 L.Zones = "Зоны"
 L.NodesPerZone = "Сколько точек появления в каждой зоне."
 L.OpenListHint = "Щелчок — весь список."
+L.WowheadPage = "Страница на Wowhead"
+L.CopyUrlClickHint = "Щелчок — скопировать адрес."
+L.CopyUrlHint = "Нажмите Ctrl+C, чтобы скопировать адрес, и вставьте его в браузер."
 L.AndMore = "и ещё %d"
 
 -- Настройки

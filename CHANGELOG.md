@@ -2,6 +2,14 @@
 
 All notable changes to Craft Compass. The text of this file goes into each release's notes.
 
+## 0.4.0 — 2026-11-02
+
+- The last row of a pinned window is the item's Wowhead page: click it to get the address, selected for Ctrl+C,
+  on the site of your game version and in your client's language. Handy for drops QuestieDB doesn't know, which
+  it keeps mostly for quest items.
+- Herbs and ores show every zone they grow in. Questie clears the spawn points of the most common herbs and veins
+  (Peacebloom, Briarthorn, copper, tin, iron...), so only a zone or two used to show.
+
 ## 0.3.0 — 2026-11-01
 
 - Where an item comes from, with Shift, in pinned windows and in the item window: herbs, ore, stone, leather and

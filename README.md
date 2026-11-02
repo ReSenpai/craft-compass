@@ -66,6 +66,9 @@ who sells the item, which creatures drop it, what it is found in or contained in
 In a pinned window each of these lines is clickable and opens the whole list: every vendor, every creature with
 its level and zone, every zone with how many herbs or veins it has.
 
+Drops come from QuestieDB, which knows them mostly for quest items. To check the rest, the last row of a pinned
+window is the item's Wowhead page: click it and copy the address with Ctrl+C (addons can't open a browser).
+
 ### And also
 
 - **Quests in chat.** Shift-click a quest in a pinned window to link it in chat, in the `[Name (id)]` form Questie

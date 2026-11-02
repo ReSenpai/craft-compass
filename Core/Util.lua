@@ -60,6 +60,19 @@ function Util.ItemIdFromLink(link)
     return link and tonumber(link:match("|Hitem:(%d+)"))
 end
 
+-- Wowhead's language folders by client locale; English and languages it lacks have none.
+local WOWHEAD_LANGUAGES = {
+    deDE = "de", esES = "es", esMX = "es", frFR = "fr", itIT = "it", ptBR = "pt", ruRU = "ru", koKR = "ko", zhCN = "cn"
+}
+
+--- An item's page on Wowhead, for the client's game version and language.
+function Util.WowheadItemUrl(itemId)
+    local interface = select(4, GetBuildInfo())
+    local site = (interface >= 20000 and interface < 30000) and "tbc" or "classic"
+    local language = WOWHEAD_LANGUAGES[GetLocale()]
+    return "https://www.wowhead.com/" .. site .. (language and "/" .. language or "") .. "/item=" .. itemId
+end
+
 --- Whether the character has a skill line with this (localized) name.
 function Util.HasSkill(name)
     for i = 1, GetNumSkillLines() do

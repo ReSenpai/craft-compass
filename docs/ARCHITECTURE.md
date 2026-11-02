@@ -122,7 +122,8 @@ facts the addon keeps itself:
 QuestieDB has the herbs and veins as objects with their spawn points, but doesn't link herbs to the items they
 give. So after login the index goes over every object once (250 per step) and keeps those whose raw name
 (`Object.GetRaw`, English on every client) is in `NODES`. `Gathering.GetZones` adds up their spawn points by zone
-and sorts the zones, most points first. `Gathering.IsNode` lets the sources leave the veins out of "found in",
+and sorts the zones, most points first. The spawn points are read with `GetRaw` too: Questie's corrections clear
+them for the 24 most common herbs and veins (Briarthorn, copper...), which it never draws on the map. `Gathering.IsNode` lets the sources leave the veins out of "found in",
 since the gathering line covers them.
 
 ## The line model (`Core/Lines.lua`)
@@ -136,6 +137,7 @@ A line is a table:
 | `right`, `rightColor` | right text and its colour (`x4`, `3/4`) |
 | `link` | the item or spell link the line stands for; in a pinned window the row becomes clickable |
 | `open` | a list a click opens in a nested window: `{kind, itemId, label}`, built by `Lines.ForList` |
+| `url` | a web page a click offers to copy (the item's Wowhead page) |
 | `quest` | the quest id the line stands for |
 | `wrap` | let a long text wrap: tooltips wrap it, pinned windows wrap it at a set width |
 | `spacer` | an empty line between sections |
@@ -154,8 +156,9 @@ Builders return `lines, pending`, where `pending` means some item names weren't 
 - `Lines.ForList(open)` — the whole list behind a source line: vendors (the other faction last, greyed out),
   creatures with level and zones, objects, containers (item rows), quests, or zones with their spawn points.
 - `Lines.ForOrigin(itemId)` — `ForCraft` of the item's craft, if it is crafted, followed by `ForSources`.
-- `Lines.ForWindow(itemId)` — for a pinned window: `ForOrigin`, then `ForItemUses`. Reagents are ordinary rows
-  with links, so they open like any other item.
+- `Lines.ForWindow(itemId)` — for a pinned window: `ForOrigin`, then `ForItemUses`, then the item's Wowhead page
+  (`Util.WowheadItemUrl`: `classic` or `tbc` by the client's interface version, and its language folder). Reagents
+  are ordinary rows with links, so they open like any other item.
 - `Lines.AddToTooltip(tooltip, lines)` — draws lines with `AddLine` / `AddDoubleLine`.
 
 ## Tooltips (`UI/Tooltip.lua`)
@@ -208,7 +211,8 @@ What a row does:
 | Right click, Alt-click, Alt over it | nested window one level deeper | — |
 
 A source row (zones, sold by, drops from, found in, contained in, quest reward) shows a hint on hover and opens its
-whole list one level deeper on any click.
+whole list one level deeper on any click. The Wowhead row opens a `StaticPopup` with the address selected for
+Ctrl+C: addons can't open a browser, and the edit box puts the address back if it is typed over.
 
 **Items from chat:** `hooksecurefunc("SetItemRef", ...)` sees every link click: chat, quest log and anything else
 that goes through `SetItemRef`. With Alt held on an `item:` link, the addon opens a level 1 window for it and

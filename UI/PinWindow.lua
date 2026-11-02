@@ -4,7 +4,8 @@ screen; reagents are rows like the rest, so they open in turn. Alt over an item 
 row of a window (or a right click on it) opens a nested window beside it, one level deeper.
 Rows are buttons: hover shows the row's tooltip, a click opens the item window, Shift-click
 links the item or quest in chat. Alt-click on an item link in chat opens a window too. A source
-row (sold by, drops from, zones...) opens the whole list in a nested window on a click.
+row (sold by, drops from, zones...) opens the whole list in a nested window on a click. The
+last row offers the item's Wowhead page to copy.
 ]]
 local _, ns = ...
 local L, Util, Lines, Quests = ns.L, ns.Util, ns.Lines, ns.Quests
@@ -25,6 +26,37 @@ local MAX_HEIGHT_SHARE = 0.6
 
 -- Windows by nesting level, 1 being the one opened from an ordinary tooltip.
 local windows = {}
+
+-- A dialog with a web page's address selected for copying: addons can't open a browser.
+StaticPopupDialogs.CRAFTCOMPASS_COPY_URL = {
+    text = L.CopyUrlHint,
+    button1 = CLOSE,
+    hasEditBox = true,
+    editBoxWidth = 360,
+    OnShow = function (dialog, url)
+        local editBox = dialog.editBox or dialog.EditBox
+        editBox:SetText(url)
+        editBox:HighlightText()
+        editBox:SetFocus()
+    end,
+    -- The address is there to be copied, not edited.
+    EditBoxOnTextChanged = function (editBox, url)
+        if editBox:GetText() ~= url then
+            editBox:SetText(url)
+            editBox:HighlightText()
+        end
+    end,
+    EditBoxOnEnterPressed = function (editBox)
+        editBox:GetParent():Hide()
+    end,
+    EditBoxOnEscapePressed = function (editBox)
+        editBox:GetParent():Hide()
+    end,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+    preferredIndex = 3
+}
 
 --- Puts a link into the chat input like Shift-clicking one does, opening the input when it's closed.
 local function InsertChatLink(text)
@@ -51,6 +83,11 @@ local function Row_OnEnter(row)
         GameTooltip:AddLine(row.open.label, 1, 0.82, 0)
         GameTooltip:AddLine(L.OpenListHint, 0.65, 0.65, 0.65)
         GameTooltip:Show()
+    elseif row.url then
+        GameTooltip:AddLine(L.WowheadPage, 1, 0.82, 0)
+        GameTooltip:AddLine(row.url, 1, 1, 1)
+        GameTooltip:AddLine(L.CopyUrlClickHint, 0.65, 0.65, 0.65)
+        GameTooltip:Show()
     elseif row.link then
         -- Items get their extra lines from the tooltip hook; ns.Tooltip adds them to enchants.
         GameTooltip:SetHyperlink(Util.LinkData(row.link))
@@ -66,6 +103,8 @@ end
 local function Row_OnClick(row, button)
     if row.open then
         PinWindow.OpenList(row)
+    elseif row.url then
+        StaticPopup_Show("CRAFTCOMPASS_COPY_URL", nil, nil, row.url)
     elseif row.quest then
         if IsModifiedClick("CHATLINK") then
             InsertChatLink(Quests.GetChatLink(row.quest))
@@ -228,6 +267,7 @@ local function Fill(window, lines)
         row.link = line.link
         row.quest = line.quest
         row.open = line.open
+        row.url = line.url
         row.wraps = line.wrap and not line.spacer
         local text = row.wraps and row.wrapText or row.text
         row.text:SetShown(not row.wraps)
@@ -236,7 +276,7 @@ local function Fill(window, lines)
         text:SetTextColor(unpack(line.color or {1, 1, 1}))
         row.right:SetText(line.right or "")
         row.right:SetTextColor(unpack(line.rightColor or {1, 1, 1}))
-        row:EnableMouse(line.link ~= nil or line.quest ~= nil or line.open ~= nil)
+        row:EnableMouse(line.link ~= nil or line.quest ~= nil or line.open ~= nil or line.url ~= nil)
         row:ClearAllPoints()
         if previous then
             row:SetPoint("TOPLEFT", previous, "BOTTOMLEFT")

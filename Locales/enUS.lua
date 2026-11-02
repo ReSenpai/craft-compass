@@ -19,6 +19,9 @@ L.WhereToGet = "Where to get"
 L.Zones = "Zones"
 L.NodesPerZone = "How many spawn points each zone has."
 L.OpenListHint = "Click for the whole list."
+L.WowheadPage = "Wowhead page"
+L.CopyUrlClickHint = "Click to copy the address."
+L.CopyUrlHint = "Press Ctrl+C to copy the address, then paste it into your browser."
 L.AndMore = "and %d more"
 
 -- Options

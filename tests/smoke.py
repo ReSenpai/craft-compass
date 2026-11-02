@@ -55,6 +55,10 @@ end
 CreateFrame = function(kind, name) local f = NewFrame(kind, name); if name then _G[name] = f end; return f end
 UIParent = NewFrame("Frame"); UIParent.GetHeight = function() return 1000 end; UIParent.GetRight = function() return 1900 end
 UISpecialFrames = {}
+StaticPopupDialogs = {}
+CLOSE = "Close"
+StaticPopup_Show = function(which, a, b, data) POPUP = which .. " " .. tostring(data) end
+GetBuildInfo = function() return "1.15.9", "1", "Nov 1 2026", 11509 end
 BackdropTemplateMixin = {}
 C_Timer = {NewTicker = function(_, fn) return {Cancel = function() end} end, After = function(_, fn) fn() end}
 geterrorhandler = function() return function(e) error(e) end end
@@ -133,11 +137,16 @@ LibQuestieDB = {
     end},
     Object = {
         GetAllIds = function() return {50, 60, 61} end,
-        GetRaw = function(id, f) if f == "name" then return ({[50] = "Solid Chest", [60] = "Dreamfoil", [61] = "Dreamfoil"})[id] end end,
+        GetRaw = function(id, f)
+            if f == "name" then return ({[50] = "Solid Chest", [60] = "Dreamfoil", [61] = "Dreamfoil"})[id] end
+            if f == "spawns" and id == 60 then return {[16] = {{1, 1}, {2, 2}}, [361] = {{3, 3}}} end
+            if f == "spawns" and id == 61 then return {[361] = {{4, 4}, {5, 5}}, [490] = {{6, 6}, {7, 7}, {8, 8}}} end
+        end,
         Get = function(id, f)
             if f == "name" then return ({[50] = "Solid Chest", [60] = "Dreamfoil", [61] = "Dreamfoil"})[id] end
             if f == "zoneID" then return 16 end
-            if f == "spawns" and id == 60 then return {[16] = {{1, 1}, {2, 2}}, [361] = {{3, 3}}} end
+            -- Questie clears the spawns of common gathering nodes; only the raw data has them
+            if f == "spawns" and id == 60 then return {} end
             if f == "spawns" and id == 61 then return {[361] = {{4, 4}, {5, 5}}, [490] = {{6, 6}, {7, 7}, {8, 8}}} end
         end
     },
@@ -278,6 +287,15 @@ for _, kind in ipairs({"npcDrops", "zones"}) do
     for i = 1, 3 do
         local row = list.rows[i]
         p(string.format("  %s", row.text.text .. " | " .. row.right.text))
+    end
+end
+-- The last row offers the item's Wowhead page to copy
+for _, row in ipairs(CraftCompassWindow1.rows) do
+    if row.shown and row.url then
+        row.scripts.OnEnter(row)
+        dump("hover Wowhead row")
+        row.scripts.OnClick(row, "LeftButton")
+        p("wowhead click: " .. tostring(POPUP))
     end
 end
 for _, row in ipairs(CraftCompassWindow1.rows) do

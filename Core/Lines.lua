@@ -8,6 +8,7 @@ A line is a table:
     link        an item or spell link the line stands for (pinned windows make it clickable)
     quest       a quest id the line stands for
     open        a list a click opens in a pinned window, {kind, itemId, label} (Lines.ForList)
+    url         a web page a click offers to copy (pinned windows)
     wrap        let a long text wrap; pinned windows wrap it at a set width
     spacer      an empty line between sections
 Builders return the lines and whether some item names weren't cached yet, in which case the
@@ -440,17 +441,18 @@ end
 
 --[[
 A pinned window's lines: what the item's craft takes and where the item comes from, so its
-reagents can be opened in turn, then what the item is used for.
+reagents can be opened in turn, then what the item is used for, and last a link to its Wowhead
+page, where the drops the addon's sources lack can be checked.
 ]]
 function Lines.ForWindow(itemId)
     local lines, pending = Lines.ForOrigin(itemId)
     local useLines, usePending = Lines.ForItemUses(itemId)
-    if not lines then
-        return useLines, usePending
-    end
+    lines = lines or {}
     for _, line in ipairs(useLines) do
         table.insert(lines, line)
     end
+    table.insert(lines, {spacer = true})
+    table.insert(lines, {text = L.WowheadPage, color = MUTED_COLOR, url = Util.WowheadItemUrl(itemId)})
     return lines, pending or usePending
 end
 

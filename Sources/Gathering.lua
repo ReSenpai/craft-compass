@@ -230,10 +230,14 @@ function Gathering.GetZones(itemId)
         return unpack(zonesByItem[itemId])
     end
     EnsureIndex()
+    -- Questie clears the spawns of the most common herbs and veins (it never draws them on the
+    -- map), so they are read from the base data.
+    local objectDb = LibQuestieDB.Object
+    local getSpawns = objectDb.GetRaw or objectDb.Get
     local counts = {}
     for _, name in ipairs(nodes) do
         for _, objectId in ipairs(objectsByNode[name] or {}) do
-            local spawns = Quests.Get("Object", objectId, "spawns")
+            local spawns = Util.SafeCall(getSpawns, objectId, "spawns")
             for zoneId, points in pairs(type(spawns) == "table" and spawns or {}) do
                 counts[zoneId] = (counts[zoneId] or 0) + (type(points) == "table" and #points or 1)
             end
