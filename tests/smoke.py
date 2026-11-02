@@ -125,6 +125,7 @@ LibQuestieDB = {
         -- Dreamfoil: a chest, a herb node and a long drop list
         if id == 13463 and f == "objectDrops" then return {50, 60} end
         if id == 13463 and f == "npcDrops" then local t = {} for i = 1, 500 do t[i] = 1000 + i end return t end
+        if id == 13463 and f == "vendors" then return {2, 3} end
     end},
     Npc = {Get = function(id, f)
         if f == "name" then return "Npc" .. id end
@@ -271,7 +272,7 @@ GameTooltip.owner = UIParent
 GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(13463)
 GameTooltip.scripts.OnTooltipSetItem(GameTooltip)
 ALT = false
-for _, kind in ipairs({"npcDrops", "zones"}) do
+for _, kind in ipairs({"vendors", "zones"}) do
     for _, row in ipairs(CraftCompassWindow1.rows) do
         if row.shown and row.open and row.open.kind == kind and row.wraps ~= nil then
             row.scripts.OnEnter(row)

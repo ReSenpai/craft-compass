@@ -167,7 +167,6 @@ local SKINNED = {
 }
 
 local objectsByNode = {}
-local isNodeObject = {}
 local zonesByItem = {}
 local finishIndex
 
@@ -187,7 +186,6 @@ local function BuildIndex()
         if name and NODES[name] then
             objectsByNode[name] = objectsByNode[name] or {}
             table.insert(objectsByNode[name], objectId)
-            isNodeObject[objectId] = true
         end
         if i % OBJECTS_PER_STEP == 0 then
             coroutine.yield()
@@ -255,12 +253,6 @@ function Gathering.GetZones(itemId)
     end)
     zonesByItem[itemId] = {zones, counts}
     return zones, counts
-end
-
---- Whether a QuestieDB object is a herb or a vein, which the gathering line already covers.
-function Gathering.IsNode(objectId)
-    EnsureIndex()
-    return isNodeObject[objectId] == true
 end
 
 ns.OnLogin(function ()

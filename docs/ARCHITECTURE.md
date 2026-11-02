@@ -102,10 +102,14 @@ step. It takes items from:
 `Quests.IsForPlayer` checks `requiredRaces` and `requiredClasses`, bit masks with the flag `2^(id-1)`. They are
 checked with arithmetic: Lua 5.1 has no bit operators, and the client's `bit.band` stops at 32 bits.
 
-QuestieDB also provides where items come from (`Item` fields `vendors`, `npcDrops`, `objectDrops`, `itemDrops`, `questRewards`), NPC
+QuestieDB also provides where items come from (`Item` fields `vendors` and `questRewards`), NPC
 faction (`friendlyToFaction`: `"A"`, `"H"`, `"AH"`), NPC level (`minLevel`, `maxLevel`) and zones (`zoneID`,
 `zoneOrSort`, named through `C_Map.GetAreaInfo`). An NPC or object shows its main zone and then the other zones of
 its `spawns`: the Darkmoon Faire's vendors have `zoneID` Mulgore, but stand in Elwynn Forest too.
+
+Its drop fields (`npcDrops`, `objectDrops`, `itemDrops`) are not used on purpose. Questie fills them from Wowhead
+only for quest items; the rest come from an emulator's database (CMaNGOS) and are often wrong: rogue quest mobs
+"dropping" herbs at 21%, for one. The pinned window links the item's Wowhead page instead.
 
 Without QuestieDB there are no quests, and items and recipes are shown without their sources. Calls into other addons go
 through `Util.SafeCall`, so a change in their API doesn't break tooltips.
@@ -123,8 +127,7 @@ QuestieDB has the herbs and veins as objects with their spawn points, but doesn'
 give. So after login the index goes over every object once (250 per step) and keeps those whose raw name
 (`Object.GetRaw`, English on every client) is in `NODES`. `Gathering.GetZones` adds up their spawn points by zone
 and sorts the zones, most points first. The spawn points are read with `GetRaw` too: Questie's corrections clear
-them for the 24 most common herbs and veins (Briarthorn, copper...), which it never draws on the map. `Gathering.IsNode` lets the sources leave the veins out of "found in",
-since the gathering line covers them.
+them for the 24 most common herbs and veins (Briarthorn, copper...), which it never draws on the map.
 
 ## The line model (`Core/Lines.lua`)
 
@@ -148,13 +151,13 @@ Builders return `lines, pending`, where `pending` means some item names weren't 
   skill, with the reagent count. Then the quests that ask for it, for this race and class, sorted by level, completed
   ones marked. Settings filter both. When there is nothing, it adds the "not used" line.
 - `Lines.ForCraft(spellId)` — profession and skill, each reagent with *have/need* (bags and bank, green when enough),
-  then the recipe: "trainer", or the recipe item with up to two vendors (the player's faction first), drops,
-  containers and quest rewards, plus "and N more".
+  then the recipe: "trainer", or the recipe item with up to two vendors (the player's faction first) and quest
+  rewards, plus "and N more".
 - `Lines.ForSources(itemId)` — "where to get": the gathering profession with its skill and the top three zones,
-  then vendors, drops, objects, containers and quest rewards from QuestieDB. Each list names two and adds
-  "and N more"; names are looked up only for those two, since cloth drops from hundreds of NPCs.
+  then vendors and quest rewards from QuestieDB. Each list names two and adds "and N more"; names are looked up
+  only for those two.
 - `Lines.ForList(open)` — the whole list behind a source line: vendors (the other faction last, greyed out),
-  creatures with level and zones, objects, containers (item rows), quests, or zones with their spawn points.
+  quests, or zones with their spawn points.
 - `Lines.ForOrigin(itemId)` — `ForCraft` of the item's craft, if it is crafted, followed by `ForSources`.
 - `Lines.ForWindow(itemId)` — for a pinned window: `ForOrigin`, then `ForItemUses`, then the item's Wowhead page
   (`Util.WowheadItemUrl`: `classic` or `tbc` by the client's interface version, and its language folder). Reagents
@@ -210,7 +213,7 @@ What a row does:
 | Shift-click | link in chat | `[Name (id)]` in chat, which Questie makes a quest link |
 | Right click, Alt-click, Alt over it | nested window one level deeper | — |
 
-A source row (zones, sold by, drops from, found in, contained in, quest reward) shows a hint on hover and opens its
+A source row (zones, sold by, quest reward) shows a hint on hover and opens its
 whole list one level deeper on any click. The Wowhead row opens a `StaticPopup` with the address selected for
 Ctrl+C: addons can't open a browser, and the edit box puts the address back if it is typed over.
 

@@ -52,22 +52,22 @@ as usual, with what the craft takes added and a reminder that Alt-click lets you
 
 Pin a crafted item, hover it in a pinned window, click it, or hold Shift over it anywhere: the profession and skill
 that make it, every reagent with how many you have (bags and bank) against how many it needs, and its recipe:
-taught by the trainer, or the recipe item and who sells it, which creatures drop it, where it is found and which
-quest rewards it. In a pinned window the reagents open in nested windows like any other row, so you can follow an
+taught by the trainer, or the recipe item with who sells it and which quest rewards it. In a pinned window the reagents open in nested windows like any other row, so you can follow an
 oil or a thread back to where it comes from.
 
-![The item window of Swiftness Potion: alchemy, its reagents and where the recipe is found](docs/images/item-window.png)
+![The item window of Swiftness Potion: alchemy, its reagents and its recipe](docs/images/item-window.png)
 
 ### Where to get it
 
 The same places show where an item comes from. A herb, an ore or a stone shows the profession that gathers it with
 the skill it needs and the zones where it grows most; leather and hides show the skinning skill they start at. Then
-who sells the item, which creatures drop it, what it is found in or contained in and which quest rewards it.
-In a pinned window each of these lines is clickable and opens the whole list: every vendor, every creature with
-its level and zone, every zone with how many herbs or veins it has.
+who sells the item and which quest rewards it. In a pinned window each of these lines is clickable and opens the
+whole list: every vendor with their level and zone, every zone with how many herbs or veins it has.
 
-Drops come from QuestieDB, which knows them mostly for quest items. To check the rest, the last row of a pinned
-window is the item's Wowhead page: click it and copy the address with Ctrl+C (addons can't open a browser).
+Craft Compass is a compass: it points you the right way, it isn't a database. It doesn't say which creatures drop an
+item or which chests it is found in: the data addons have on that comes from private-server databases and is too
+often wrong. For that, the last row of a pinned window is the item's Wowhead page: click it and copy the address with
+Ctrl+C (addons can't open a browser).
 
 ### And also
 

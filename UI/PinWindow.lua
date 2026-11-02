@@ -4,7 +4,7 @@ screen; reagents are rows like the rest, so they open in turn. Alt over an item 
 row of a window (or a right click on it) opens a nested window beside it, one level deeper.
 Rows are buttons: hover shows the row's tooltip, a click opens the item window, Shift-click
 links the item or quest in chat. Alt-click on an item link in chat opens a window too. A source
-row (sold by, drops from, zones...) opens the whole list in a nested window on a click. The
+row (zones, sold by, quest reward) opens the whole list in a nested window on a click. The
 last row offers the item's Wowhead page to copy.
 ]]
 local _, ns = ...
@@ -378,7 +378,7 @@ function PinWindow.Show(level, link, isRefresh)
     }, isRefresh)
 end
 
---- Opens the whole list a source row stands for (all vendors, drops, zones...) one level deeper.
+--- Opens the whole list a source row stands for (all zones, vendors, quests) one level deeper.
 function PinWindow.OpenList(row)
     local open = row.open
     local _, link = Util.GetItemInfo(open.itemId)

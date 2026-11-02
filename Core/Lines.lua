@@ -24,7 +24,7 @@ local HEADER_COLOR = {0.31, 0.52, 0.83}
 local MUTED_COLOR = {0.65, 0.65, 0.65}
 local ENOUGH_COLOR = {0.1, 1, 0.1}
 local QUEST_ICON = "Interface\\GossipFrame\\AvailableQuestIcon"
--- How many vendors, drops and so on a source line names before "and N more".
+-- How many vendors or quests a source line names before "and N more".
 local SOURCES_SHOWN = 2
 local ZONES_SHOWN = 3
 
@@ -141,8 +141,8 @@ function Lines.ForItemUses(itemId)
 end
 
 --[[
-The first few names out of a list of ids, and how many ids pass the filter in all. Drop lists run
-to hundreds of NPCs (cloth), so names are looked up only for the ones shown.
+The first few names out of a list of ids, and how many ids pass the filter in all. Names are
+looked up only for the ones shown.
 ]]
 local function FirstNames(ids, getName, filter, shown)
     local names, total = {}, 0
@@ -181,54 +181,38 @@ local function NpcName(npcId)
     return Quests.GetPlaceName("Npc", npcId) or ("#" .. npcId)
 end
 
-local function ObjectName(objectId)
-    return Quests.GetPlaceName("Object", objectId) or ("#" .. objectId)
-end
-
-local function ItemName(itemId)
-    return Quests.Get("Item", itemId, "name") or Util.GetItemInfo(itemId) or ("#" .. itemId)
-end
-
 local function IsFriendlyNpc(npcId)
     local factionLetter = UnitFactionGroup("player") == "Horde" and "H" or "A"
     local friendly = Quests.Get("Npc", npcId, "friendlyToFaction")
     return type(friendly) ~= "string" or friendly:find(factionLetter) ~= nil
 end
 
-local function IsNotNode(objectId)
-    return not Gathering.IsNode(objectId)
-end
-
--- The lists a source line can open: the QuestieDB field each one reads and how its ids are named.
+--[[
+The lists a source line can open: the QuestieDB field each one reads and how its ids are named.
+Drops (creatures, chests, containers) are left out on purpose: QuestieDB has them right only for
+quest items, the rest come from an emulator's database and are often wrong. The window's Wowhead
+row is there for those.
+]]
 local SOURCE_LISTS = {
     {kind = "vendors", label = "SoldBy", getName = NpcName},
-    {kind = "npcDrops", label = "DropsFrom", getName = NpcName},
-    {kind = "objectDrops", label = "FoundIn", getName = ObjectName, filter = IsNotNode},
-    {kind = "itemDrops", label = "ContainedIn", getName = ItemName},
     {kind = "questRewards", label = "QuestReward", getName = Quests.GetName}
 }
 
---- The ids of one of an item's QuestieDB source lists, the herbs and veins left out.
+--- The ids of one of an item's QuestieDB source lists.
 local function SourceIds(itemId, list)
-    local ids = {}
-    local all = Quests.Get("Item", itemId, list.kind)
-    for _, id in ipairs(type(all) == "table" and all or {}) do
-        if not list.filter or list.filter(id) then
-            table.insert(ids, id)
-        end
-    end
-    return ids
+    local ids = Quests.Get("Item", itemId, list.kind)
+    return type(ids) == "table" and ids or {}
 end
 
 --[[
-Where an item comes from in QuestieDB: vendors, drops, objects, containers and quest rewards.
-Herbs and veins are left to the gathering line. Returns whether it added anything.
+Where an item comes from in QuestieDB: vendors and quest rewards. Returns whether it added
+anything.
 ]]
 local function AddSources(lines, itemId)
     local count = #lines
     for _, list in ipairs(SOURCE_LISTS) do
-        local ids = Quests.Get("Item", itemId, list.kind)
-        local names, total = FirstNames(ids, list.getName, list.filter)
+        local ids = SourceIds(itemId, list)
+        local names, total = FirstNames(ids, list.getName)
         -- Vendors the character can buy from are named first; the others rather than nothing.
         if list.kind == "vendors" then
             local friendly, friendlyTotal = FirstNames(ids, NpcName, IsFriendlyNpc)
@@ -251,7 +235,7 @@ end
 
 --[[
 Where an item comes from: the profession that gathers it with the skill it needs and the zones it
-grows in, then vendors, drops and the rest. Nil when nothing is known.
+grows in, then vendors and quest rewards. Nil when nothing is known.
 ]]
 function Lines.ForSources(itemId)
     local lines = {{spacer = true}, {text = L.WhereToGet, color = HEADER_COLOR}}
@@ -283,18 +267,18 @@ local function NpcLevel(npcId)
     return tostring(low)
 end
 
---- Rows of NPCs or objects: "[level] Name" on the left and its zones on the right, by zone and name.
-local function AddPlaceRows(lines, entity, ids, color)
+--- Rows of NPCs: "[level] Name" on the left and its zones on the right, by zone and name.
+local function AddNpcRows(lines, ids, color)
     local places = {}
     for _, id in ipairs(ids) do
-        local level = entity == "Npc" and NpcLevel(id)
-        local zones, zoneCount = Quests.GetZoneNames(entity, id, 2)
+        local level = NpcLevel(id)
+        local zones, zoneCount = Quests.GetZoneNames("Npc", id, 2)
         local zone = table.concat(zones, ", ")
         if zoneCount > #zones then
             zone = zone .. " +" .. (zoneCount - #zones)
         end
         table.insert(places, {
-            name = (level and "[" .. level .. "] " or "") .. (Quests.Get(entity, id, "name") or ("#" .. id)),
+            name = (level and "[" .. level .. "] " or "") .. (Quests.Get("Npc", id, "name") or ("#" .. id)),
             zone = zone
         })
     end
@@ -311,7 +295,8 @@ end
 
 --[[
 The whole list a source line stands for, for its own pinned window. open is the {kind, itemId,
-label} of that line. Returns the lines and whether some item names weren't cached yet.
+label} of that line. Returns the lines and whether some item names weren't cached yet (never, as
+these lists name NPCs, quests and zones).
 ]]
 function Lines.ForList(open)
     local lines, pending = {}, false
@@ -337,21 +322,8 @@ function Lines.ForList(open)
         for _, npcId in ipairs(ids) do
             table.insert(IsFriendlyNpc(npcId) and friendly or hostile, npcId)
         end
-        AddPlaceRows(lines, "Npc", friendly)
-        AddPlaceRows(lines, "Npc", hostile, MUTED_COLOR)
-    elseif open.kind == "npcDrops" then
-        AddPlaceRows(lines, "Npc", ids)
-    elseif open.kind == "objectDrops" then
-        AddPlaceRows(lines, "Object", ids)
-    elseif open.kind == "itemDrops" then
-        for _, containerId in ipairs(ids) do
-            local name, link = Util.GetItemInfo(containerId)
-            pending = pending or name == nil
-            table.insert(lines, {
-                text = Util.Icon(Util.GetItemIcon(containerId)) .. (link or ItemName(containerId)),
-                link = link
-            })
-        end
+        AddNpcRows(lines, friendly)
+        AddNpcRows(lines, hostile, MUTED_COLOR)
     elseif open.kind == "questRewards" then
         local quests = {}
         for _, questId in ipairs(ids) do
