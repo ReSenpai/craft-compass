@@ -11,6 +11,8 @@ All notable changes to Craft Compass. The text of this file goes into each relea
   guess.
 - Instead of drops, the last row of a pinned window is the item's Wowhead page: click it and press Ctrl+C to copy
   the address, on the site of your game version and in your client's language. The dialog closes by itself.
+- Enchants open in pinned windows too: Alt over an enchant row (or Alt-click, or a right click) shows what it does,
+  what it takes, where its formula comes from and its Wowhead page. Hovering an enchant row shows its tooltip.
 - Herbs and ores show every zone they grow in. Questie clears the spawn points of the most common herbs and veins
   (Peacebloom, Briarthorn, copper, tin, iron...), so only a zone or two used to show.
 - The list of zones no longer shows how many spawn points each has: the numbers come from private-server data and

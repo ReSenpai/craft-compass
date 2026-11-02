@@ -161,8 +161,11 @@ Builders return `lines, pending`, where `pending` means some item names weren't 
   quests, or every zone, the richest first.
 - `Lines.ForOrigin(itemId)` — `ForCraft` of the item's craft, if it is crafted, followed by `ForSources`.
 - `Lines.ForWindow(itemId)` — for a pinned window: `ForOrigin`, then `ForItemUses`, then the item's Wowhead page
-  (`Util.WowheadItemUrl`: `classic` or `tbc` by the client's interface version, and its language folder). Reagents
+  (`Util.WowheadUrl`: `classic` or `tbc` by the client's interface version, and its language folder). Reagents
   are ordinary rows with links, so they open like any other item.
+- `Lines.ForSpellWindow(spellId)` — for a pinned window of a craft that makes no item (an enchant): the spell's
+  description, `ForCraft`, and the spell's Wowhead page. A description the client hasn't loaded yet is asked for
+  (`Util.LoadSpell`), and the window is drawn again once it arrives.
 - `Lines.AddToTooltip(tooltip, lines)` — draws lines with `AddLine` / `AddDoubleLine`.
 
 ## Tooltips (`UI/Tooltip.lua`)
@@ -184,15 +187,18 @@ What gets added:
 - **Modifier keys:** `MODIFIER_STATE_CHANGED` calls the `OnEnter` of the hovered tooltip's owner again. Pressing or
   releasing Shift or Alt over an item then redraws without moving the mouse.
 - **Pinned rows** carry `craftCompassLevel`. A tooltip whose owner has it belongs to a pinned window, at that level.
-- **Enchants and spells** don't go through the item hook. `Tooltip.AddCraftToSpellTooltip` adds their craft to a
-  pinned row's tooltip.
+- **Enchants and spells** don't go through the item hook. A pinned row of one shows the spell by id
+  (`SetSpellByID`, which works for enchants where a `spell:`/`enchant:` hyperlink may not), and
+  `Tooltip.AddCraftToSpellTooltip` adds its craft. Alt over the row opens it nested from the row itself, and
+  `MODIFIER_STATE_CHANGED` redraws a pinned row's tooltip too, so pressing Alt while hovering works.
 
 ## Pinned windows (`UI/PinWindow.lua`)
 
 Windows are frames `CraftCompassWindow1`, `CraftCompassWindow2`, … by nesting level. They are created on first use
 and reused after that. Level 1 is opened from a tooltip or from chat; level *n + 1* from a row of level *n*.
 
-- **Content:** a window shows either an item (`PinWindow.Show`: `Lines.ForWindow`) or a source list
+- **Content:** a window shows either an item or an enchant (`PinWindow.Show`: `Lines.ForWindow` or
+  `Lines.ForSpellWindow`, by the link) or a source list
   (`PinWindow.OpenList`: `Lines.ForList`), through one `ShowContent(level, {key, title, titleLink, build})`.
 - **Layout:** the title is the item link itself (a row, so it can be hovered and clicked), and below it a scroll
   frame of rows. The width fits the longest row; rows marked `wrap` (sources) take at most 320 pixels beyond that

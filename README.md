@@ -35,7 +35,8 @@ for the item window, **Shift-click** to link it in chat. Long lists scroll; Esca
 ![A pinned window for Briarthorn; Healing Potion hovered in it shows what it takes and what it is used for](docs/images/pinned-window.png)
 
 Alt over a row (or Alt-click, or a right click) opens a nested window beside it, as deep as you like: from a herb to
-the elixir made of it to the belt made of that.
+the elixir made of it to the belt made of that. An enchant opens the same way: what it does, what it takes and where
+its formula comes from.
 
 ![Three nested windows: Briarthorn, Elixir of Wisdom, Hillman's Belt](docs/images/nested-windows.png)
 
@@ -52,8 +53,8 @@ as usual, with what the craft takes added and a reminder that Alt-click lets you
 
 Pin a crafted item, hover it in a pinned window, click it, or hold Shift over it anywhere: the profession and skill
 that make it, every reagent with how many you have (bags and bank) against how many it needs, and its recipe:
-taught by the trainer, or the recipe item with who sells it and which quest rewards it. In a pinned window the reagents open in nested windows like any other row, so you can follow an
-oil or a thread back to where it comes from.
+taught by the trainer, or the recipe item with who sells it and which quest rewards it. In a pinned window the
+reagents open in nested windows like any other row, so you can follow an oil or a thread back to where it comes from.
 
 ![The item window of Swiftness Potion: alchemy, its reagents and its recipe](docs/images/item-window.png)
 

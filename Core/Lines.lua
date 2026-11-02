@@ -23,6 +23,8 @@ ns.Lines = Lines
 local HEADER_COLOR = {0.31, 0.52, 0.83}
 local MUTED_COLOR = {0.65, 0.65, 0.65}
 local ENOUGH_COLOR = {0.1, 1, 0.1}
+-- The green of "Use:" and "Equip:" in item tooltips.
+local EFFECT_COLOR = {0.1, 1, 0.1}
 local QUEST_ICON = "Interface\\GossipFrame\\AvailableQuestIcon"
 -- How many vendors or quests a source line names before "and N more".
 local SOURCES_SHOWN = 2
@@ -422,8 +424,32 @@ function Lines.ForWindow(itemId)
         table.insert(lines, line)
     end
     table.insert(lines, {spacer = true})
-    table.insert(lines, {text = L.WowheadPage, color = MUTED_COLOR, url = Util.WowheadItemUrl(itemId)})
+    table.insert(lines, {text = L.WowheadPage, color = MUTED_COLOR, url = Util.WowheadUrl("item", itemId)})
     return lines, pending or usePending
+end
+
+--[[
+A pinned window of a craft that makes no item, an enchant: what it does, what it takes and where
+its recipe comes from, and its Wowhead page.
+]]
+function Lines.ForSpellWindow(spellId)
+    local lines, pending = {}, false
+    local description = Util.GetSpellDescription(spellId)
+    if description and description ~= "" then
+        table.insert(lines, {text = description, color = EFFECT_COLOR, wrap = true})
+    else
+        -- The window is drawn again with the description once the client has it.
+        pending = Util.LoadSpell(spellId, function ()
+            ns.PinWindow.RefreshPending()
+        end)
+    end
+    local craftLines, craftPending = Lines.ForCraft(spellId)
+    for _, line in ipairs(craftLines or {}) do
+        table.insert(lines, line)
+    end
+    table.insert(lines, {spacer = true})
+    table.insert(lines, {text = L.WowheadPage, color = MUTED_COLOR, url = Util.WowheadUrl("spell", spellId)})
+    return lines, pending or craftPending
 end
 
 --- Draws lines into a tooltip.

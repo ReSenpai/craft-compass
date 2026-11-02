@@ -60,17 +60,43 @@ function Util.ItemIdFromLink(link)
     return link and tonumber(link:match("|Hitem:(%d+)"))
 end
 
+--- The spell of a spell or enchant link, as crafts without an item (enchants) are linked.
+function Util.SpellIdFromLink(link)
+    return link and tonumber(link:match("|Henchant:(%d+)") or link:match("|Hspell:(%d+)"))
+end
+
+--- What a spell does, as its tooltip says; empty until the client has the spell's data.
+function Util.GetSpellDescription(spellId)
+    if GetSpellDescription then
+        return GetSpellDescription(spellId)
+    end
+    return C_Spell and C_Spell.GetSpellDescription and C_Spell.GetSpellDescription(spellId)
+end
+
+--[[
+Asks the client for a spell's data it doesn't have yet and calls back once it arrives. Returns
+whether it asked: false when the data is already there (or the client can't say).
+]]
+function Util.LoadSpell(spellId, callback)
+    local spell = Spell and Spell.CreateFromSpellID and Spell:CreateFromSpellID(spellId)
+    if not spell or spell:IsSpellDataCached() then
+        return false
+    end
+    spell:ContinueOnSpellLoad(callback)
+    return true
+end
+
 -- Wowhead's language folders by client locale; English and languages it lacks have none.
 local WOWHEAD_LANGUAGES = {
     deDE = "de", esES = "es", esMX = "es", frFR = "fr", itIT = "it", ptBR = "pt", ruRU = "ru", koKR = "ko", zhCN = "cn"
 }
 
---- An item's page on Wowhead, for the client's game version and language.
-function Util.WowheadItemUrl(itemId)
+--- An item's or spell's page on Wowhead (kind "item" or "spell"), for the client's game version and language.
+function Util.WowheadUrl(kind, id)
     local interface = select(4, GetBuildInfo())
     local site = (interface >= 20000 and interface < 30000) and "tbc" or "classic"
     local language = WOWHEAD_LANGUAGES[GetLocale()]
-    return "https://www.wowhead.com/" .. site .. (language and "/" .. language or "") .. "/item=" .. itemId
+    return "https://www.wowhead.com/" .. site .. (language and "/" .. language or "") .. "/" .. kind .. "=" .. id
 end
 
 --- Whether the character has a skill line with this (localized) name.

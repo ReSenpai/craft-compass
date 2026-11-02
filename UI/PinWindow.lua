@@ -103,9 +103,19 @@ local function Row_OnEnter(row)
         GameTooltip:AddLine(L.CopyUrlClickHint, 0.65, 0.65, 0.65)
         GameTooltip:Show()
     elseif row.link then
-        -- Items get their extra lines from the tooltip hook; ns.Tooltip adds them to enchants.
-        GameTooltip:SetHyperlink(Util.LinkData(row.link))
-        ns.Tooltip.AddCraftToSpellTooltip(GameTooltip, row.link)
+        local spellId = Util.SpellIdFromLink(row.link)
+        if spellId then
+            -- Crafts without an item (enchants): the tooltip hook only sees items, so Alt over the
+            -- row opens it nested here, and ns.Tooltip adds what the craft takes.
+            if IsAltKeyDown() then
+                PinWindow.OpenNested(row)
+            end
+            GameTooltip:SetSpellByID(spellId)
+            ns.Tooltip.AddCraftToSpellTooltip(GameTooltip, row.link)
+        else
+            -- Items get their extra lines from the tooltip hook.
+            GameTooltip:SetHyperlink(Util.LinkData(row.link))
+        end
         GameTooltip:Show()
     end
 end
@@ -374,10 +384,14 @@ local function ShowContent(level, content, isRefresh)
     window:Raise()
 end
 
---- Shows what the item behind a link takes, where it comes from and what it is used for.
+--[[
+Shows what the item behind a link takes, where it comes from and what it is used for; for an
+enchant's link, what it does and what it takes.
+]]
 function PinWindow.Show(level, link, isRefresh)
     local itemId = Util.ItemIdFromLink(link)
-    if not itemId then
+    local spellId = not itemId and Util.SpellIdFromLink(link)
+    if not itemId and not spellId then
         return
     end
     ShowContent(level, {
@@ -387,7 +401,10 @@ function PinWindow.Show(level, link, isRefresh)
             return link
         end,
         build = function ()
-            return Lines.ForWindow(itemId)
+            if itemId then
+                return Lines.ForWindow(itemId)
+            end
+            return Lines.ForSpellWindow(spellId)
         end
     }, isRefresh)
 end

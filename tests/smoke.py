@@ -58,6 +58,7 @@ UISpecialFrames = {}
 StaticPopupDialogs = {}
 CLOSE = "Close"
 StaticPopup_Show = function(which, a, b, data) POPUP = which .. " " .. tostring(data) end
+GetSpellDescription = function(id) return "Permanently enchant boots (spell " .. id .. ")." end
 GetBuildInfo = function() return "1.15.9", "1", "Nov 1 2026", 11509 end
 BackdropTemplateMixin = {}
 C_Timer = {NewTicker = function(_, fn) return {Cancel = function() end} end, After = function(_, fn) fn() end}
@@ -101,6 +102,7 @@ for _, tt in ipairs({GameTooltip, ItemRefTooltip}) do
     tt.GetOwner = function(self) return self.owner end
     tt.GetItem = function(self) return self.itemName, self.itemLink end
     tt.SetHyperlink = function(self, data) end
+    tt.SetSpellByID = function(self, id) self:AddLine("spell tooltip " .. id) end
 end
 
 -- AtlasLoot: two crafts using Light Leather
@@ -226,6 +228,15 @@ for _, row in ipairs(w.rows) do if row.link and row.link:find("spell:2152") then
 ALT = false
 enchantRow.scripts.OnEnter(enchantRow)
 dump("hover enchant/spell row")
+-- Alt over the enchant row opens it nested: what it does, what it takes, its Wowhead page
+ALT = true
+enchantRow.scripts.OnEnter(enchantRow)
+ALT = false
+TOOLTIP_LINES = {}
+p("enchant window: shown=" .. tostring(CraftCompassWindow2.shown) .. " title=" .. tostring(CraftCompassWindow2.title.text.text))
+for _, row in ipairs(CraftCompassWindow2.rows) do
+    if row.shown then p("  " .. (row.wraps and row.wrapText.text or row.text.text) .. " | " .. row.right.text .. (row.url and " url=" .. row.url or "")) end
+end
 for _, row in ipairs(w.rows) do if row.quest then row.scripts.OnClick(row, "LeftButton"); break end end
 p("chat=" .. tostring(INSERTED))
 w:Hide()

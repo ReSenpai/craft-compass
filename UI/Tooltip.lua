@@ -31,7 +31,7 @@ end
 
 --- Adds what a craft takes to the tooltip of an enchant or spell link, which the item hook doesn't see.
 function Tooltip.AddCraftToSpellTooltip(tooltip, link)
-    local spellId = tonumber(link:match("|Henchant:(%d+)") or link:match("|Hspell:(%d+)") or "")
+    local spellId = Util.SpellIdFromLink(link)
     if spellId and AddCraft(tooltip, spellId) then
         pending[tooltip] = true
     end
@@ -106,11 +106,12 @@ local function RefreshItemWindow()
     end
 end
 
--- Shift, Ctrl and Alt change what an item tooltip shows, so it is drawn again when they change.
+-- Shift, Ctrl and Alt change what an item tooltip shows, so it is drawn again when they change;
+-- over an enchant row of a pinned window, Alt opens it.
 local modifierFrame = CreateFrame("Frame")
 modifierFrame:RegisterEvent("MODIFIER_STATE_CHANGED")
 modifierFrame:SetScript("OnEvent", function ()
-    if GameTooltip:IsShown() and GameTooltip:GetItem() then
+    if GameTooltip:IsShown() and (GameTooltip:GetItem() or GetPinnedRow(GameTooltip)) then
         RefreshHovered()
     end
 end)
