@@ -4,7 +4,8 @@ screen; reagents are rows like the rest, so they open in turn. Alt over an item 
 row of a window (or a right click on it) opens a nested window beside it, which closes with it
 unless it was dragged away.
 Rows are buttons: hover shows the row's tooltip, a click opens the item window, Shift-click
-links the item or quest in chat. Alt-click on an item link in chat opens a window too. A source
+links the item or quest in chat; a quest row opens the quest's window. Alt-click on an item link in
+chat opens a window too. A source
 row (zones, sold by, quest reward) opens the whole list in a nested window on a click. The
 last row offers the item's Wowhead page to copy.
 ]]
@@ -88,16 +89,27 @@ end
 local function Row_OnEnter(row)
     GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
     if row.quest then
-        GameTooltip:AddLine(Quests.GetName(row.quest), 1, 0.82, 0)
-        local level = Quests.GetLevel(row.quest)
-        if level then
-            GameTooltip:AddLine(string.format(L.QuestLevel, level), 1, 1, 1)
+        -- Alt over a quest row opens its window, as for items.
+        if IsAltKeyDown() then
+            PinWindow.OpenQuest(row)
         end
-        local zone = Quests.GetZone(row.quest)
-        if zone then
-            GameTooltip:AddLine(zone, 1, 1, 1)
+        -- Questie's own tooltip of the quest when Questie is there, else its name, level and zone.
+        if not Quests.AddQuestieTooltip(GameTooltip, row.quest) then
+            GameTooltip:AddLine(Quests.GetName(row.quest), 1, 0.82, 0)
+            local level = Quests.GetLevel(row.quest)
+            if level then
+                GameTooltip:AddLine(string.format(L.QuestLevel, level), 1, 1, 1)
+            end
+            local zone = Quests.GetZone(row.quest)
+            if zone then
+                GameTooltip:AddLine(zone, 1, 1, 1)
+            end
         end
-        GameTooltip:AddLine(L.QuestLinkHint, 0.65, 0.65, 0.65)
+        GameTooltip:AddLine(row.isTitle and L.QuestTitleHint or L.QuestLinkHint, 0.65, 0.65, 0.65)
+        GameTooltip:Show()
+    elseif row.action then
+        GameTooltip:AddLine(row.text:GetText(), 1, 0.82, 0)
+        GameTooltip:AddLine(row.hint, 0.65, 0.65, 0.65)
         GameTooltip:Show()
     elseif row.open then
         GameTooltip:AddLine(row.open.label, 1, 0.82, 0)
@@ -135,9 +147,13 @@ local function Row_OnClick(row, button)
         PinWindow.OpenList(row)
     elseif row.url then
         StaticPopup_Show("CRAFTCOMPASS_COPY_URL", nil, nil, row.url)
+    elseif row.action then
+        row.action()
     elseif row.quest then
         if IsModifiedClick("CHATLINK") then
             InsertChatLink(Quests.GetChatLink(row.quest))
+        else
+            PinWindow.OpenQuest(row)
         end
     elseif row.link then
         -- With Alt the row is opened nested, not as a new first window by the chat link hook.
@@ -347,6 +363,8 @@ local function Fill(window, lines)
         row.quest = line.quest
         row.open = line.open
         row.url = line.url
+        row.action = line.action
+        row.hint = line.hint
         row.wraps = line.wrap and not line.spacer
         local text = row.wraps and row.wrapText or row.text
         row.text:SetShown(not row.wraps)
@@ -355,7 +373,7 @@ local function Fill(window, lines)
         text:SetTextColor(unpack(line.color or {1, 1, 1}))
         row.right:SetText(line.right or "")
         row.right:SetTextColor(unpack(line.rightColor or {1, 1, 1}))
-        row:EnableMouse(line.link ~= nil or line.quest ~= nil or line.open ~= nil or line.url ~= nil)
+        row:EnableMouse(line.link ~= nil or line.quest ~= nil or line.open ~= nil or line.url ~= nil or line.action ~= nil)
         row:ClearAllPoints()
         if previous then
             row:SetPoint("TOPLEFT", previous, "BOTTOMLEFT")
@@ -414,6 +432,7 @@ local function ShowContent(window, content, isRefresh)
     window.view = content
     window.pending = pending
     window.title.link = content.titleLink
+    window.title.quest = content.titleQuest
     window.title.text:SetText(content.title())
 
     local width, contentHeight = Fill(window, lines)
@@ -478,6 +497,24 @@ function PinWindow.OpenList(row)
         build = function ()
             local lines, pending = Lines.ForList(open)
             return lines, pending or link == nil
+        end
+    })
+end
+
+--- Opens the quest of a pinned row in its window's nested window: what the quest asks and its chain.
+function PinWindow.OpenQuest(row)
+    local questId = row.quest
+    if not questId or row.isTitle then
+        return
+    end
+    ShowContent(WindowFor(row.craftCompassWindow), {
+        key = "quest:" .. questId,
+        titleQuest = questId,
+        title = function ()
+            return "|cffffd100" .. Quests.GetName(questId) .. "|r"
+        end,
+        build = function ()
+            return Lines.ForQuestWindow(questId)
         end
     })
 end

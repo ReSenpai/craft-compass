@@ -2,6 +2,14 @@
 
 All notable changes to Craft Compass. The text of this file goes into each release's notes.
 
+## 0.5.0 — 2026-11-03
+
+- A click on a quest (or Alt over it, or a right click) opens its window: level and zone, whether it's done or in your
+  log, what it says to do, who gives it and who takes it back, the items to bring with how many you have, the quests
+  before and after it in the chain (they open too) and its Wowhead page. Shift-click still links it in chat.
+- With Questie itself loaded, hovering a quest shows Questie's tooltip of it, and the quest's window has an "Open in
+  Questie" row for Questie's own window of the quest.
+
 ## 0.4.0 — 2026-11-03
 
 - Drag a nested window away and it stays on its own: closing the window it came from no longer closes it, and that

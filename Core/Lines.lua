@@ -9,6 +9,7 @@ A line is a table:
     quest       a quest id the line stands for
     open        a list a click opens in a pinned window, {kind, itemId, label} (Lines.ForList)
     url         a web page a click offers to copy (pinned windows)
+    action      a function a click calls (pinned windows), with hint, the text its tooltip shows
     wrap        let a long text wrap; pinned windows wrap it at a set width
     spacer      an empty line between sections
 Builders return the lines and whether some item names weren't cached yet, in which case the
@@ -450,6 +451,146 @@ function Lines.ForSpellWindow(spellId)
     table.insert(lines, {spacer = true})
     table.insert(lines, {text = L.WowheadPage, color = MUTED_COLOR, url = Util.WowheadUrl("spell", spellId)})
     return lines, pending or craftPending
+end
+
+--- A quest's row: "[level] Name", marked when the character has completed it.
+local function QuestLine(questId)
+    local text = "[" .. (Quests.GetLevel(questId) or 0) .. "] " .. Quests.GetName(questId)
+    if Util.IsQuestCompleted(questId) then
+        text = text .. " |cff808080(" .. L.Completed .. ")|r"
+    end
+    return {text = text, quest = questId}
+end
+
+-- What QuestieDB's startedBy and finishedBy list, in order: NPCs, objects, then items.
+local QUEST_END_ENTITIES = {"Npc", "Object"}
+
+--[[
+Who gives a quest or takes it back: "label: a, b and N more" for NPCs and objects, then a row of
+its own for each item that starts it, so the item can be opened.
+]]
+local function AddQuestEnds(lines, label, by)
+    by = type(by) == "table" and by or {}
+    local names, total = {}, 0
+    for i, entity in ipairs(QUEST_END_ENTITIES) do
+        for _, id in ipairs(type(by[i]) == "table" and by[i] or {}) do
+            total = total + 1
+            if #names < SOURCES_SHOWN then
+                table.insert(names, Quests.GetPlaceName(entity, id) or ("#" .. id))
+            end
+        end
+    end
+    if #names > 0 then
+        local text = table.concat(names, ", ")
+        if total > #names then
+            text = text .. " " .. string.format(L.AndMore, total - #names)
+        end
+        table.insert(lines, {text = label .. ": |cffffffff" .. text .. "|r", color = MUTED_COLOR, wrap = true})
+    end
+
+    local pending = false
+    for _, itemId in ipairs(type(by[3]) == "table" and by[3] or {}) do
+        local _, link = Util.GetItemInfo(itemId)
+        pending = pending or link == nil
+        table.insert(lines, {text = label .. ": " .. (link or "..."), color = MUTED_COLOR, link = link})
+    end
+    return pending
+end
+
+--- Quest rows under a header, for the quests before and after one in its chain.
+local function AddQuestRows(lines, header, questIds)
+    if #questIds == 0 then
+        return
+    end
+    table.insert(lines, {spacer = true})
+    table.insert(lines, {text = header, color = HEADER_COLOR})
+    for _, questId in ipairs(questIds) do
+        table.insert(lines, QuestLine(questId))
+    end
+end
+
+--[[
+A pinned window of a quest, from QuestieDB: its level, zone and state, what it says to do, who
+gives it and takes it back, the items to bring (rows that open), the quests before and after it,
+then Questie's own window of it, when Questie is there, and its Wowhead page.
+]]
+function Lines.ForQuestWindow(questId)
+    local lines, pending = {}, false
+
+    local level = Quests.GetLevel(questId)
+    local required = Quests.Get("Quest", questId, "requiredLevel")
+    local info = {}
+    if level and type(required) == "number" and required > 0 and required < level then
+        table.insert(info, string.format(L.QuestLevels, level, required))
+    elseif level then
+        table.insert(info, string.format(L.QuestLevel, level))
+    end
+    local zone = Quests.GetZone(questId)
+    if zone then
+        table.insert(info, zone)
+    end
+    if Util.IsQuestCompleted(questId) then
+        table.insert(info, L.Completed)
+    elseif Util.IsQuestInLog(questId) then
+        table.insert(info, L.InQuestLog)
+    end
+    if #info > 0 then
+        table.insert(lines, {text = table.concat(info, ", "), color = MUTED_COLOR})
+    end
+
+    local objectivesText = Quests.Get("Quest", questId, "objectivesText")
+    if type(objectivesText) == "table" and #objectivesText > 0 then
+        table.insert(lines, {spacer = true})
+        table.insert(lines, {text = table.concat(objectivesText, " "), wrap = true})
+    end
+
+    table.insert(lines, {spacer = true})
+    pending = AddQuestEnds(lines, L.QuestStartedBy, Quests.Get("Quest", questId, "startedBy")) or pending
+    pending = AddQuestEnds(lines, L.QuestFinishedBy, Quests.Get("Quest", questId, "finishedBy")) or pending
+
+    local objectives = Quests.Get("Quest", questId, "objectives")
+    local items = type(objectives) == "table" and type(objectives[3]) == "table" and objectives[3] or {}
+    if #items > 0 then
+        table.insert(lines, {spacer = true})
+        table.insert(lines, {text = Util.Icon(QUEST_ICON) .. L.QuestItems, color = HEADER_COLOR})
+        for _, objective in ipairs(items) do
+            local itemId, needed = objective[1], objective[3] or 1
+            local name, link = Util.GetItemInfo(itemId)
+            pending = pending or name == nil
+            local have = Util.GetItemCount(itemId) or 0
+            table.insert(lines, {
+                text = Util.Icon(Util.GetItemIcon(itemId)) .. (name or "..."),
+                right = have .. "/" .. needed,
+                rightColor = have >= needed and ENOUGH_COLOR or nil,
+                link = link
+            })
+        end
+    end
+
+    local before = {}
+    for _, field in ipairs({"preQuestSingle", "preQuestGroup"}) do
+        local ids = Quests.Get("Quest", questId, field)
+        for _, id in ipairs(type(ids) == "table" and ids or {}) do
+            table.insert(before, id)
+        end
+    end
+    AddQuestRows(lines, L.QuestBefore, before)
+    local nextQuest = Quests.Get("Quest", questId, "nextQuestInChain")
+    AddQuestRows(lines, L.QuestNext, (type(nextQuest) == "number" and nextQuest > 0) and {nextQuest} or {})
+
+    table.insert(lines, {spacer = true})
+    if Quests.CanOpenInQuestie() then
+        table.insert(lines, {
+            text = L.OpenInQuestie,
+            color = MUTED_COLOR,
+            action = function ()
+                Quests.OpenInQuestie(questId)
+            end,
+            hint = L.OpenInQuestieHint
+        })
+    end
+    table.insert(lines, {text = L.WowheadPage, color = MUTED_COLOR, url = Util.WowheadUrl("quest", questId)})
+    return lines, pending
 end
 
 --- Draws lines into a tooltip.

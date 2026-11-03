@@ -82,7 +82,7 @@ C_Map = {GetAreaInfo = function(id) return "Zone" .. id end}
 IsAltKeyDown = function() return ALT end
 IsShiftKeyDown = function() return SHIFT end
 IsControlKeyDown = function() return false end
-IsModifiedClick = function() return true end
+IsModifiedClick = function() return SHIFT end
 ChatEdit_InsertLink = function(t) INSERTED = t; return true end
 SetItemRef = function(link) ITEMREF = link end
 hooksecurefunc = function(name, hook)
@@ -103,6 +103,7 @@ for _, tt in ipairs({GameTooltip, ItemRefTooltip}) do
     tt.GetOwner = function(self) return self.owner end
     tt.GetItem = function(self) return self.itemName, self.itemLink end
     tt.SetHyperlink = function(self, data) end
+    tt.NumLines = function(self) return #TOOLTIP_LINES end
     tt.SetSpellByID = function(self, id) self:AddLine("spell tooltip " .. id) end
 end
 
@@ -116,7 +117,9 @@ AtlasLoot = {Data = {
 }}
 -- QuestieDB
 local quests = {
-    [100] = {name = "Leather for the Smith", questLevel = 12, objectives = {nil, nil, {{2318, nil, 10}}}, zoneOrSort = 12},
+    [100] = {name = "Leather for the Smith", questLevel = 12, requiredLevel = 10, objectives = {nil, nil, {{2318, nil, 10}}}, zoneOrSort = 12,
+        objectivesText = {"Bring 10 Light Leather", "to the smith."}, startedBy = {{1}, nil, {2302}}, finishedBy = {{2, 3, 4}},
+        preQuestSingle = {101}, nextQuestInChain = 102},
     [101] = {name = "Old Leather Quest", questLevel = 8, objectives = {nil, nil, {{2318, nil, 4}}}},
     [102] = {name = "Horde Only", questLevel = 10, requiredRaces = 2, objectives = {nil, nil, {{2318}}}},
 }
@@ -238,7 +241,9 @@ p("enchant window: shown=" .. tostring(CraftCompassWindow2.shown) .. " title=" .
 for _, row in ipairs(CraftCompassWindow2.rows) do
     if row.shown then p("  " .. (row.wraps and row.wrapText.text or row.text.text) .. " | " .. row.right.text .. (row.url and " url=" .. row.url or "")) end
 end
+SHIFT = true
 for _, row in ipairs(w.rows) do if row.quest then row.scripts.OnClick(row, "LeftButton"); break end end
+SHIFT = false
 p("chat=" .. tostring(INSERTED))
 w:Hide()
 p("after close: window2 shown=" .. tostring(CraftCompassWindow2.shown))
@@ -314,6 +319,50 @@ end
 for _, row in ipairs(CraftCompassWindow1.rows) do
     if row.shown and row.wraps then p("wrapped row: " .. row.wrapText.text .. " width=" .. tostring(row.wrapText.w)) end
 end
+
+-- A click on a quest row opens the quest's window; with Questie loaded, its tooltip and window too
+QuestieLoader = {ImportModule = function(_, name)
+    if name == "QuestieLink" then
+        return {CreateQuestTooltip = function(self, link, tooltip) tooltip:AddLine("Questie tooltip " .. link) end}
+    end
+    if name == "QuestieSearchResults" then
+        return {GetDetailFrame = function(self, kind, id) QUESTIE_OPENED = kind .. " " .. id end}
+    end
+    return {}
+end}
+Questie = {started = true}
+UnitGUID = function() return "Player-1" end
+CraftCompassWindow1:Hide()
+SHIFT, ALT = false, true
+GameTooltip.owner = UIParent
+GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(2318)
+GameTooltip.scripts.OnTooltipSetItem(GameTooltip)
+ALT = false
+local questRow
+for _, row in ipairs(CraftCompassWindow1.rows) do if row.shown and row.quest == 100 then questRow = row end end
+questRow.scripts.OnEnter(questRow)
+dump("hover quest row")
+questRow.scripts.OnClick(questRow, "LeftButton")
+p("quest window: shown=" .. tostring(CraftCompassWindow2.shown) .. " title=" .. tostring(CraftCompassWindow2.title.text.text))
+local beforeRow, questieRow
+for _, row in ipairs(CraftCompassWindow2.rows) do
+    if row.shown then
+        p("  " .. (row.wraps and row.wrapText.text or row.text.text) .. " | " .. row.right.text
+            .. (row.link and " link" or "") .. (row.quest and " quest=" .. row.quest or "") .. (row.url and " url=" .. row.url or "")
+            .. (row.action and " action" or ""))
+        if row.quest == 101 then beforeRow = row end
+        if row.action then questieRow = row end
+    end
+end
+questieRow.scripts.OnEnter(questieRow)
+dump("hover open-in-Questie row")
+questieRow.scripts.OnClick(questieRow, "LeftButton")
+p("questie opened: " .. tostring(QUESTIE_OPENED))
+beforeRow.scripts.OnClick(beforeRow, "RightButton")
+p("before quest: window3 title=" .. tostring(CraftCompassWindow3 and CraftCompassWindow3.title.text.text))
+CraftCompassWindow2.title.scripts.OnEnter(CraftCompassWindow2.title)
+dump("hover quest window title")
+QuestieLoader, Questie = nil, nil
 
 -- A dragged nested window is detached: it stays when its parent closes, and the parent opens rows in a new one
 CraftCompassWindow1:Hide()

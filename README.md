@@ -75,6 +75,10 @@ Simplified Chinese), in English otherwise, and on Wowhead's Classic or TBC site 
 
 ### And also
 
+- **Quest windows.** Click a quest in a pinned window (or Alt over it) for its own window: level, zone and whether
+  it's done, what it says to do, who gives it and who takes it back, the items to bring, the quests before and after
+  it, and its Wowhead page. With Questie itself loaded, hovering a quest shows Questie's tooltip, and an "Open in
+  Questie" row opens Questie's window of it.
 - **Quests in chat.** Shift-click a quest in a pinned window to link it in chat, in the `[Name (id)]` form Questie
   turns into a clickable quest link.
 - **Any client language.** Everything is looked up by id, and item, quest, profession and zone names come in the
@@ -85,7 +89,7 @@ Simplified Chinese), in English otherwise, and on Wowhead's Classic or TBC site 
 | Addon | | What it gives |
 | --- | --- | --- |
 | [AtlasLoot Classic](https://www.curseforge.com/wow/addons/atlaslootclassic) | required | Recipes, reagents and recipe items |
-| [Questie](https://www.curseforge.com/wow/addons/questie) (QuestieDB) | optional | Quests, and where a recipe comes from |
+| [Questie](https://www.curseforge.com/wow/addons/questie) (QuestieDB) | optional | Quests and their windows, and where a recipe comes from |
 
 Craft Compass carries no item data of its own: it reads them from these addons while the game runs, so it stays as
 up to date as they are. Without Questie there are no quests and a recipe is shown without its sources.

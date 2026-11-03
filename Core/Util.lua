@@ -102,7 +102,7 @@ local WOWHEAD_LANGUAGES = {
     deDE = "de", esES = "es", esMX = "es", frFR = "fr", itIT = "it", ptBR = "pt", ruRU = "ru", koKR = "ko", zhCN = "cn"
 }
 
---- An item's or spell's page on Wowhead (kind "item" or "spell"), for the client's game version and language.
+--- A page on Wowhead (kind "item", "spell" or "quest"), for the client's game version and language.
 function Util.WowheadUrl(kind, id)
     local interface = select(4, GetBuildInfo())
     local site = (interface >= 20000 and interface < 30000) and "tbc" or "classic"
@@ -125,6 +125,22 @@ function Util.IsQuestCompleted(questId)
         return C_QuestLog.IsQuestFlaggedCompleted(questId)
     end
     return IsQuestFlaggedCompleted and IsQuestFlaggedCompleted(questId) or false
+end
+
+function Util.IsQuestInLog(questId)
+    if C_QuestLog and C_QuestLog.GetLogIndexForQuestID then
+        return C_QuestLog.GetLogIndexForQuestID(questId) ~= nil
+    end
+    if not GetNumQuestLogEntries then
+        return false
+    end
+    -- Classic clients: the quest id is the eighth value of a quest log row.
+    for i = 1, GetNumQuestLogEntries() do
+        if select(8, GetQuestLogTitle(i)) == questId then
+            return true
+        end
+    end
+    return false
 end
 
 --- Tests a 1-based flag in a race or class mask; an empty mask allows everyone.

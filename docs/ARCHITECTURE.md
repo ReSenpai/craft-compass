@@ -111,6 +111,16 @@ Its drop fields (`npcDrops`, `objectDrops`, `itemDrops`) are not used on purpose
 only for quest items; the rest come from an emulator's database (CMaNGOS) and are often wrong: rogue quest mobs
 "dropping" herbs at 21%, for one. The pinned window links the item's Wowhead page instead.
 
+A quest's window reads more of its fields: `objectivesText` (what it says to do, translated by QuestieDB),
+`startedBy` and `finishedBy` (`{npcIds, objectIds, itemIds}`), `requiredLevel`, `preQuestSingle` and `preQuestGroup`
+(the quests before it) and `nextQuestInChain`.
+
+With Questie itself loaded and started (`Questie.started`), two of its own modules are used through
+`QuestieLoader:ImportModule`: `QuestieLink:CreateQuestTooltip(link, tooltip)` for a quest row's tooltip
+(`Quests.AddQuestieTooltip`) and `QuestieSearchResults:GetDetailFrame("quest", id)` for Questie's window of a quest
+(`Quests.OpenInQuestie`). They aren't Questie's public API, so each call checks the function is there and goes through
+`SafeCall`; without them the row shows its own short tooltip and the window has no "Open in Questie" row.
+
 Without QuestieDB there are no quests, and items and recipes are shown without their sources. Calls into other addons go
 through `Util.SafeCall`, so a change in their API doesn't break tooltips.
 
@@ -141,7 +151,8 @@ A line is a table:
 | `right`, `rightColor` | right text and its colour (`x4`, `3/4`) |
 | `link` | the item or spell link the line stands for; in a pinned window the row becomes clickable |
 | `open` | a list a click opens in a nested window: `{kind, itemId, label}`, built by `Lines.ForList` |
-| `url` | a web page a click offers to copy (the item's Wowhead page) |
+| `url` | a web page a click offers to copy (a Wowhead page) |
+| `action`, `hint` | a function a click calls, and its tooltip text ("Open in Questie") |
 | `quest` | the quest id the line stands for |
 | `wrap` | let a long text wrap: tooltips wrap it, pinned windows wrap it at a set width |
 | `spacer` | an empty line between sections |
@@ -166,6 +177,10 @@ Builders return `lines, pending`, where `pending` means some item names weren't 
 - `Lines.ForSpellWindow(spellId)` — for a pinned window of a craft that makes no item (an enchant): the spell's
   description, `ForCraft`, and the spell's Wowhead page. A description the client hasn't loaded yet is asked for
   (`Util.LoadSpell`), and the window is drawn again once it arrives.
+- `Lines.ForQuestWindow(questId)` — for a pinned window of a quest: level (and the level it opens from), zone and
+  whether it is completed or in the log (`Util.IsQuestInLog`), `objectivesText`, who gives and takes it back, the
+  items to bring as item rows with "have/need", the quests before and after it as quest rows, "Open in Questie" when
+  Questie is there, and the quest's Wowhead page.
 - `Lines.AddToTooltip(tooltip, lines)` — draws lines with `AddLine` / `AddDoubleLine`.
 
 ## Tooltips (`UI/Tooltip.lua`)
@@ -199,7 +214,7 @@ reused. The first is opened from a tooltip or from chat. A row of a window opens
 one `child`, which knows its `parent` (`WindowFor(parent)` gives the child, or links a free window as one).
 
 - **Content:** a window shows either an item or an enchant (`PinWindow.Show`: `Lines.ForWindow` or
-  `Lines.ForSpellWindow`, by the link) or a source list
+  `Lines.ForSpellWindow`, by the link), a quest (`PinWindow.OpenQuest`: `Lines.ForQuestWindow`) or a source list
   (`PinWindow.OpenList`: `Lines.ForList`), through one `ShowContent(window, {key, title, titleLink, build})`.
 - **Layout:** the title is the item link itself (a row, so it can be hovered and clicked), and below it a scroll
   frame of rows. The width fits the longest row; rows marked `wrap` (sources) take at most 320 pixels beyond that
@@ -219,10 +234,10 @@ What a row does:
 
 | Action | Item or reagent row | Quest row |
 | --- | --- | --- |
-| Hover | its tooltip (item tooltip with its craft, or quest name, level, zone) | quest tooltip |
-| Click | item window (`SetItemRef`) | — |
+| Hover | its tooltip (item tooltip with its craft) | Questie's quest tooltip, or name, level and zone |
+| Click | item window (`SetItemRef`) | quest window, nested |
 | Shift-click | link in chat | `[Name (id)]` in chat, which Questie makes a quest link |
-| Right click, Alt-click, Alt over it | nested window | — |
+| Right click, Alt-click, Alt over it | nested window | quest window, nested |
 
 A source row (zones, sold by, quest reward) shows a hint on hover and opens its
 whole list in the nested window on any click. The Wowhead row opens a `StaticPopup` with the address selected for

@@ -95,6 +95,43 @@ function Quests.GetZone(questId)
 end
 
 --[[
+One of Questie's own modules, when Questie itself (not only its database) is loaded and has
+started. These aren't Questie's public API, so callers check for the functions they use.
+]]
+function Quests.QuestieModule(name)
+    if not (QuestieLoader and Questie and Questie.started) then
+        return nil
+    end
+    local module = Util.SafeCall(QuestieLoader.ImportModule, QuestieLoader, name)
+    return type(module) == "table" and module or nil
+end
+
+--- Adds Questie's tooltip of a quest (what it asks, who gives it, progress). Returns whether it did.
+function Quests.AddQuestieTooltip(tooltip, questId)
+    local questLink = Quests.QuestieModule("QuestieLink")
+    if not questLink or type(questLink.CreateQuestTooltip) ~= "function" then
+        return false
+    end
+    local before = tooltip:NumLines()
+    Util.SafeCall(questLink.CreateQuestTooltip, questLink, "questie:" .. questId .. ":" .. (UnitGUID("player") or ""), tooltip)
+    return tooltip:NumLines() > before
+end
+
+--- Whether Questie can show its own window of a quest.
+function Quests.CanOpenInQuestie()
+    local results = Quests.QuestieModule("QuestieSearchResults")
+    return results ~= nil and type(results.GetDetailFrame) == "function"
+end
+
+--- Opens Questie's window of a quest.
+function Quests.OpenInQuestie(questId)
+    local results = Quests.QuestieModule("QuestieSearchResults")
+    if results and type(results.GetDetailFrame) == "function" then
+        Util.SafeCall(results.GetDetailFrame, results, "quest", questId)
+    end
+end
+
+--[[
 The text that links a quest in chat. The client has no quest links of its own here, so this is
 the "[Name (id)]" text Questie turns into a clickable link; Questie's own formatting is used
 when it is loaded.
