@@ -8,6 +8,7 @@ manual-changelog:
 # LICENSE, NOTICE, README and CHANGELOG ship.
 ignore:
   - .github
+  - art
   - .editorconfig
   - .gitattributes
   - .gitignore
