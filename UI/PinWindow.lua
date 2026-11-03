@@ -112,7 +112,7 @@ local function Row_OnEnter(row)
             end
             GameTooltip:SetSpellByID(spellId)
             ns.Tooltip.AddCraftToSpellTooltip(GameTooltip, row.link)
-        else
+        elseif Util.LinkData(row.link) then
             -- Items get their extra lines from the tooltip hook.
             GameTooltip:SetHyperlink(Util.LinkData(row.link))
         end

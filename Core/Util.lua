@@ -36,11 +36,22 @@ function Util.GetSpellIcon(spellId)
     return C_Spell and C_Spell.GetSpellTexture and C_Spell.GetSpellTexture(spellId)
 end
 
+--[[
+A spell's link. Classic Era gives only the name for some spells (enchants it doesn't know), so
+the link is built around that name then.
+]]
 function Util.GetSpellLink(spellId)
+    local link
     if GetSpellLink then
-        return GetSpellLink(spellId)
+        link = GetSpellLink(spellId)
+    elseif C_Spell and C_Spell.GetSpellLink then
+        link = C_Spell.GetSpellLink(spellId)
     end
-    return C_Spell and C_Spell.GetSpellLink and C_Spell.GetSpellLink(spellId)
+    if link and link:find("|H", 1, true) then
+        return link
+    end
+    local name = link or Util.GetSpellName(spellId)
+    return name and ("|cff71d5ff|Hspell:" .. spellId .. "|h[" .. name .. "]|h|r")
 end
 
 --- An inline texture for the start of a line, or nothing without a texture.

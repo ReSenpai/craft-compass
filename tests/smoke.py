@@ -75,7 +75,8 @@ GetItemIcon = function(id) return 134000 + id end
 GetItemCount = function(id) return id == 2318 and 5 or 0 end
 GetSpellInfo = function(id) return ({[2108] = "Leatherworking", [2259] = "Alchemy"})[id] or ("Spell" .. id) end
 GetSpellTexture = function(id) return 1000 + id end
-GetSpellLink = function(id) return "|cff71d5ff|Hspell:" .. id .. "|h[Spell" .. id .. "]|h|r" end
+-- Like Classic Era for enchants: only the name, no hyperlink.
+GetSpellLink = function(id) return "Spell" .. id end
 C_QuestLog = {IsQuestFlaggedCompleted = function(id) return id == 101 end}
 C_Map = {GetAreaInfo = function(id) return "Zone" .. id end}
 IsAltKeyDown = function() return ALT end
