@@ -229,6 +229,14 @@ whole list in the nested window on any click. The Wowhead row opens a `StaticPop
 Ctrl+C: addons can't open a browser, and `CopyToClipboard` is protected. The edit box puts the address back if it
 is typed over, and Ctrl+C closes the popup the next frame, once the text is copied.
 
+The address is `https://www.wowhead.com/<site>[/<language>]/<item|spell>=<id>` (`Util.WowheadUrl(kind, id)`):
+
+- **Site:** `tbc` for a client with interface 20000–29999, `classic` for the rest (Classic Era, Season of
+  Discovery and the 16001 client).
+- **Language:** by `GetLocale()`: `deDE` → `de`, `esES` and `esMX` → `es`, `frFR` → `fr`, `itIT` → `it`, `ptBR` → `pt`,
+  `ruRU` → `ru`, `koKR` → `ko`, `zhCN` → `cn`. English clients and languages Wowhead doesn't have (`zhTW`) get no
+  language folder, which is the English page.
+
 **Items from chat:** `hooksecurefunc("SetItemRef", ...)` sees every link click: chat, quest log and anything else
 that goes through `SetItemRef`. With Alt held on an `item:` link, the addon opens it in the first window and
 hides the item window the click opened. A secure hook runs after the original and doesn't taint it.
