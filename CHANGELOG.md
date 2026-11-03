@@ -4,6 +4,8 @@ All notable changes to Craft Compass. The text of this file goes into each relea
 
 ## 0.4.0 — 2026-11-02
 
+- Drag a nested window away and it stays on its own: closing the window it came from no longer closes it, and that
+  window opens its rows in a new nested one.
 - No more "Drops from", "Found in" and "Contained in" lines. Outside quest items, the data behind them comes from
   private-server databases and was too often wrong (rogue quest mobs "dropping" herbs). Where to get an item now
   shows the gathering profession and zones, vendors and quest rewards.

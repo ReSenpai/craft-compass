@@ -180,13 +180,13 @@ What gets added:
 | --- | --- | --- | --- |
 | Hover, no modifier | — | — | — |
 | Hover with **Shift** or **Ctrl** | yes | yes | — |
-| Hover with **Alt** | — | — | opens pinned window, level 1 |
+| Hover with **Alt** | — | — | opens the first pinned window |
 | Hover a row of a pinned window | yes | with Shift | Alt opens a nested window |
 | Item window (`ItemRefTooltip`) | yes | — | for a crafted item, hint: Alt-click the link to pin it |
 
 - **Modifier keys:** `MODIFIER_STATE_CHANGED` calls the `OnEnter` of the hovered tooltip's owner again. Pressing or
   releasing Shift or Alt over an item then redraws without moving the mouse.
-- **Pinned rows** carry `craftCompassLevel`. A tooltip whose owner has it belongs to a pinned window, at that level.
+- **Pinned rows** carry `craftCompassWindow`. A tooltip whose owner has it belongs to that pinned window.
 - **Enchants and spells** don't go through the item hook. A pinned row of one shows the spell by id
   (`SetSpellByID`, which works for enchants where a `spell:`/`enchant:` hyperlink may not), and
   `Tooltip.AddCraftToSpellTooltip` adds its craft. Alt over the row opens it nested from the row itself, and
@@ -194,19 +194,23 @@ What gets added:
 
 ## Pinned windows (`UI/PinWindow.lua`)
 
-Windows are frames `CraftCompassWindow1`, `CraftCompassWindow2`, … by nesting level. They are created on first use
-and reused after that. Level 1 is opened from a tooltip or from chat; level *n + 1* from a row of level *n*.
+Windows are frames `CraftCompassWindow1`, `CraftCompassWindow2`, … in the order they were made; closed ones are
+reused. The first is opened from a tooltip or from chat. A row of a window opens its nested window: each window keeps
+one `child`, which knows its `parent` (`WindowFor(parent)` gives the child, or links a free window as one).
 
 - **Content:** a window shows either an item or an enchant (`PinWindow.Show`: `Lines.ForWindow` or
   `Lines.ForSpellWindow`, by the link) or a source list
-  (`PinWindow.OpenList`: `Lines.ForList`), through one `ShowContent(level, {key, title, titleLink, build})`.
+  (`PinWindow.OpenList`: `Lines.ForList`), through one `ShowContent(window, {key, title, titleLink, build})`.
 - **Layout:** the title is the item link itself (a row, so it can be hovered and clicked), and below it a scroll
   frame of rows. The width fits the longest row; rows marked `wrap` (sources) take at most 320 pixels beyond that
   and wrap, growing in height instead. The height stops at 60% of the screen; past that the list scrolls
   (mouse wheel or the bar).
-- **Placement:** level 1 opens in the centre and stays where the player dragged it. A nested window opens beside its
-  parent, on the side with room.
-- **Closing:** hiding a window hides the next level, so closing one closes everything nested in it. Escape closes
+- **Placement:** the first window opens in the centre and stays where the player dragged it. A nested window opens
+  beside its parent, on the side with room.
+- **Detaching:** dragging a nested window unlinks it from its parent and pins it to the screen where it is. It no
+  longer closes with the parent, the parent opens its rows in a new window, and its own nested window stays with it.
+- **Closing:** hiding a window hides its child, so closing one closes everything nested in it, and frees it for
+  reuse. Escape closes
   them (the windows are in `UISpecialFrames`). The close button calls `window:Hide()` directly. The standard button
   goes through `HideUIPanel`, which is blocked in combat.
 - **Same item again:** Alt over the item already shown keeps the window as it is (position, scroll, nested windows).
@@ -218,15 +222,15 @@ What a row does:
 | Hover | its tooltip (item tooltip with its craft, or quest name, level, zone) | quest tooltip |
 | Click | item window (`SetItemRef`) | — |
 | Shift-click | link in chat | `[Name (id)]` in chat, which Questie makes a quest link |
-| Right click, Alt-click, Alt over it | nested window one level deeper | — |
+| Right click, Alt-click, Alt over it | nested window | — |
 
 A source row (zones, sold by, quest reward) shows a hint on hover and opens its
-whole list one level deeper on any click. The Wowhead row opens a `StaticPopup` with the address selected for
+whole list in the nested window on any click. The Wowhead row opens a `StaticPopup` with the address selected for
 Ctrl+C: addons can't open a browser, and `CopyToClipboard` is protected. The edit box puts the address back if it
 is typed over, and Ctrl+C closes the popup the next frame, once the text is copied.
 
 **Items from chat:** `hooksecurefunc("SetItemRef", ...)` sees every link click: chat, quest log and anything else
-that goes through `SetItemRef`. With Alt held on an `item:` link, the addon opens a level 1 window for it and
+that goes through `SetItemRef`. With Alt held on an `item:` link, the addon opens it in the first window and
 hides the item window the click opened. A secure hook runs after the original and doesn't taint it.
 
 ## Names that arrive late

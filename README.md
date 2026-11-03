@@ -36,7 +36,8 @@ for the item window, **Shift-click** to link it in chat. Long lists scroll; Esca
 
 Alt over a row (or Alt-click, or a right click) opens a nested window beside it, as deep as you like: from a herb to
 the elixir made of it to the belt made of that. An enchant opens the same way: what it does, what it takes and where
-its formula comes from.
+its formula comes from. A nested window closes with the one it came from, unless you drag it away: then it stays on
+its own.
 
 ![Three nested windows: Briarthorn, Elixir of Wisdom, Hillman's Belt](docs/images/nested-windows.png)
 

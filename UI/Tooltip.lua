@@ -15,7 +15,7 @@ local pending = {}
 --- The pinned window row a tooltip belongs to, if it belongs to one.
 local function GetPinnedRow(tooltip)
     local owner = tooltip:GetOwner()
-    if owner and owner.craftCompassLevel then
+    if owner and owner.craftCompassWindow then
         return owner
     end
     return nil
@@ -68,9 +68,9 @@ local function OnTooltipSetItem(tooltip)
     end
 
     if alt and not isItemWindow then
-        -- Alt over a pinned row opens a window one level deeper; the title is that window's own item.
+        -- Alt over a pinned row opens its window's nested one; the title is that window's own item.
         if not (row and row.isTitle) then
-            PinWindow.Show(row and row.craftCompassLevel + 1 or 1, link)
+            PinWindow.Show(row and row.craftCompassWindow, link)
         end
     elseif shift then
         local lines, linesPending = Lines.ForItemUses(itemId)

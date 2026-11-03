@@ -1,7 +1,8 @@
 --[[
 Pinned windows: what an item is used for, and for a crafted item what its craft takes, kept on
 screen; reagents are rows like the rest, so they open in turn. Alt over an item opens one; Alt over a
-row of a window (or a right click on it) opens a nested window beside it, one level deeper.
+row of a window (or a right click on it) opens a nested window beside it, which closes with it
+unless it was dragged away.
 Rows are buttons: hover shows the row's tooltip, a click opens the item window, Shift-click
 links the item or quest in chat. Alt-click on an item link in chat opens a window too. A source
 row (zones, sold by, quest reward) opens the whole list in a nested window on a click. The
@@ -24,7 +25,12 @@ local WRAP_WIDTH = 320
 -- The tallest a window gets before its list scrolls, as a share of the screen.
 local MAX_HEIGHT_SHARE = 0.6
 
--- Windows by nesting level, 1 being the one opened from an ordinary tooltip.
+--[[
+Every window made so far, hidden ones reused. The first is the one an ordinary tooltip opens into.
+A nested window knows its parent and the parent its child, one at a time: a row opened from the
+parent replaces it, and it closes with the parent. Dragging a nested window detaches it, and it
+stays where it was put.
+]]
 local windows = {}
 
 -- A dialog with a web page's address selected for copying: addons can't open a browser.
@@ -163,7 +169,7 @@ local function CreateRow(window, parent)
     row.wrapText:SetWordWrap(true)
     row.wrapText:Hide()
     -- Read by the tooltip hook to tell pinned rows from everything else.
-    row.craftCompassLevel = window.level
+    row.craftCompassWindow = window
     row:SetScript("OnEnter", Row_OnEnter)
     row:SetScript("OnLeave", Row_OnLeave)
     row:SetScript("OnClick", Row_OnClick)
@@ -176,10 +182,31 @@ local function SetScroll(window, value)
     window.scrollBar:SetValue(value)
 end
 
-local function CreateWindow(level)
-    local name = "CraftCompassWindow" .. level
+--- Unlinks a window from its parent: it no longer closes with it or gets replaced from it.
+local function Detach(window)
+    local parent = window.parent
+    if parent then
+        if parent.child == window then
+            parent.child = nil
+        end
+        window.parent = nil
+    end
+end
+
+--- Starts dragging a window. A nested one is detached first, pinned where it is on the screen.
+local function StartDrag(window)
+    if window.parent then
+        local left, top = window:GetLeft(), window:GetTop()
+        Detach(window)
+        window:ClearAllPoints()
+        window:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left, top)
+    end
+    window:StartMoving()
+end
+
+local function CreateWindow()
+    local name = "CraftCompassWindow" .. (#windows + 1)
     local window = CreateFrame("Frame", name, UIParent, BackdropTemplateMixin and "BackdropTemplate")
-    window.level = level
     window.rows = {}
     window:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -196,13 +223,14 @@ local function CreateWindow(level)
     window:EnableMouse(true)
     window:SetMovable(true)
     window:RegisterForDrag("LeftButton")
-    window:SetScript("OnDragStart", window.StartMoving)
+    window:SetScript("OnDragStart", StartDrag)
     window:SetScript("OnDragStop", window.StopMovingOrSizing)
-    -- Nested windows belong to this one and close with it.
+    -- The nested window belongs to this one and closes with it; a closed window is free for reuse.
     window:SetScript("OnHide", function ()
-        if windows[level + 1] then
-            windows[level + 1]:Hide()
+        if window.child then
+            window.child:Hide()
         end
+        Detach(window)
     end)
     -- Escape closes the windows.
     table.insert(UISpecialFrames, name)
@@ -222,7 +250,7 @@ local function CreateWindow(level)
     window.title:SetHeight(ROW_HEIGHT + 6)
     window.title:SetPoint("TOPLEFT", PADDING, -PADDING)
     window.title:RegisterForDrag("LeftButton")
-    window.title:SetScript("OnDragStart", function () window:StartMoving() end)
+    window.title:SetScript("OnDragStart", function () StartDrag(window) end)
     window.title:SetScript("OnDragStop", function () window:StopMovingOrSizing() end)
 
     window.scroll = CreateFrame("ScrollFrame", nil, window)
@@ -250,7 +278,34 @@ local function CreateWindow(level)
 
     -- Frames start out shown; this one waits for its content and position.
     window:Hide()
-    windows[level] = window
+    table.insert(windows, window)
+    return window
+end
+
+--[[
+The window a row of a parent window opens into: the parent's child, or a free window that becomes
+it. Without a parent, the first window.
+]]
+local function WindowFor(parent)
+    if not windows[1] then
+        CreateWindow()
+    end
+    if not parent then
+        return windows[1]
+    end
+    if parent.child then
+        return parent.child
+    end
+    local window
+    for i = 2, #windows do
+        if not windows[i]:IsShown() and not windows[i].parent then
+            window = windows[i]
+            break
+        end
+    end
+    window = window or CreateWindow()
+    window.parent = parent
+    parent.child = window
     return window
 end
 
@@ -264,11 +319,11 @@ end
 --- Puts a nested window beside its parent, on the side with room for it.
 local function Place(window)
     window:ClearAllPoints()
-    if window.level == 1 then
+    local parent = window.parent
+    if not parent then
         window:SetPoint("CENTER")
         return
     end
-    local parent = windows[window.level - 1]
     if (parent:GetRight() or 0) + window:GetWidth() > UIParent:GetRight() then
         window:SetPoint("TOPRIGHT", parent, "TOPLEFT", 2, 0)
     else
@@ -342,18 +397,17 @@ local function Fill(window, lines)
 end
 
 --[[
-Shows content in the window at a level: {key, title, titleLink, build}, where title is a function
-returning the title text and build returns the lines and whether some names are still pending.
-The same content again keeps the window as it is. A refresh redraws the window in place (names
-that have arrived since), keeping its position, scroll and nested windows.
+Shows content in a window: {key, title, titleLink, build}, where title is a function returning the
+title text and build returns the lines and whether some names are still pending. The same content
+again keeps the window as it is. A refresh redraws the window in place (names that have arrived
+since), keeping its position, scroll and nested window.
 ]]
-local function ShowContent(level, content, isRefresh)
-    local window = windows[level] or CreateWindow(level)
+local function ShowContent(window, content, isRefresh)
     if window:IsShown() and window.view and window.view.key == content.key and not isRefresh then
         return
     end
-    if not isRefresh and windows[level + 1] then
-        windows[level + 1]:Hide()
+    if not isRefresh and window.child then
+        window.child:Hide()
     end
 
     local lines, pending = content.build()
@@ -376,7 +430,7 @@ local function ShowContent(level, content, isRefresh)
     local windowWidth = width + PADDING * 2 + (overflow and SCROLLBAR_WIDTH + 6 or 0)
     window:SetSize(math.max(windowWidth, MIN_WIDTH), PADDING * 2 + window.title:GetHeight() + scrollHeight)
     -- The first window stays where the player dragged it; nested ones follow their parent.
-    if not isRefresh and (level > 1 or not window.placed) then
+    if not isRefresh and (window.parent or not window.placed) then
         Place(window)
         window.placed = true
     end
@@ -386,15 +440,16 @@ end
 
 --[[
 Shows what the item behind a link takes, where it comes from and what it is used for; for an
-enchant's link, what it does and what it takes.
+enchant's link, what it does and what it takes. Opened from a row of a parent window, it shows in
+that window's nested one; without a parent, in the first window.
 ]]
-function PinWindow.Show(level, link, isRefresh)
+function PinWindow.Show(parent, link)
     local itemId = Util.ItemIdFromLink(link)
     local spellId = not itemId and Util.SpellIdFromLink(link)
     if not itemId and not spellId then
         return
     end
-    ShowContent(level, {
+    ShowContent(WindowFor(parent), {
         key = link,
         titleLink = link,
         title = function ()
@@ -406,14 +461,14 @@ function PinWindow.Show(level, link, isRefresh)
             end
             return Lines.ForSpellWindow(spellId)
         end
-    }, isRefresh)
+    })
 end
 
---- Opens the whole list a source row stands for (all zones, vendors, quests) one level deeper.
+--- Opens the whole list a source row stands for (all zones, vendors, quests) in a nested window.
 function PinWindow.OpenList(row)
     local open = row.open
     local _, link = Util.GetItemInfo(open.itemId)
-    ShowContent(row.craftCompassLevel + 1, {
+    ShowContent(WindowFor(row.craftCompassWindow), {
         key = open.kind .. ":" .. open.itemId,
         titleLink = link,
         title = function ()
@@ -427,18 +482,18 @@ function PinWindow.OpenList(row)
     })
 end
 
---- Opens the item of a pinned row in a window one level deeper.
+--- Opens the item of a pinned row in its window's nested window.
 function PinWindow.OpenNested(row)
     if row.link and not row.isTitle then
-        PinWindow.Show(row.craftCompassLevel + 1, row.link)
+        PinWindow.Show(row.craftCompassWindow, row.link)
     end
 end
 
 --- Redraws the windows that were waiting for item names.
 function PinWindow.RefreshPending()
-    for level, window in ipairs(windows) do
+    for _, window in ipairs(windows) do
         if window:IsShown() and window.pending then
-            ShowContent(level, window.view, true)
+            ShowContent(window, window.view, true)
         end
     end
 end
@@ -447,7 +502,7 @@ end
 -- pins the item instead of opening the item window.
 hooksecurefunc("SetItemRef", function (link, text)
     if IsAltKeyDown() and type(link) == "string" and link:match("^item:") and text then
-        PinWindow.Show(1, text)
+        PinWindow.Show(nil, text)
         ItemRefTooltip:Hide()
     end
 end)

@@ -315,6 +315,31 @@ for _, row in ipairs(CraftCompassWindow1.rows) do
     if row.shown and row.wraps then p("wrapped row: " .. row.wrapText.text .. " width=" .. tostring(row.wrapText.w)) end
 end
 
+-- A dragged nested window is detached: it stays when its parent closes, and the parent opens rows in a new one
+CraftCompassWindow1:Hide()
+SHIFT, ALT = false, true
+GameTooltip.owner = UIParent
+GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(2318)
+GameTooltip.scripts.OnTooltipSetItem(GameTooltip)
+local function BootsRow()
+    for _, row in ipairs(CraftCompassWindow1.rows) do if row.shown and row.link and row.link:find("item:2302") then return row end end
+end
+BootsRow().scripts.OnClick(BootsRow(), "RightButton")
+ALT = false
+CraftCompassWindow2.scripts.OnDragStart(CraftCompassWindow2)
+CraftCompassWindow2.scripts.OnDragStop(CraftCompassWindow2)
+CraftCompassWindow1:Hide()
+p("dragged: window1 shown=" .. tostring(CraftCompassWindow1.shown) .. " window2 shown=" .. tostring(CraftCompassWindow2.shown))
+ALT = true
+GameTooltip.scripts.OnTooltipSetItem(GameTooltip)
+BootsRow().scripts.OnClick(BootsRow(), "RightButton")
+ALT = false
+p("reopened: window2 title=" .. tostring(CraftCompassWindow2.title.text.text) .. " window3 shown=" .. tostring(CraftCompassWindow3 and CraftCompassWindow3.shown))
+CraftCompassWindow2:Hide()
+p("detached closed: window1 shown=" .. tostring(CraftCompassWindow1.shown) .. " window3 shown=" .. tostring(CraftCompassWindow3.shown))
+CraftCompassWindow1:Hide()
+p("first closed: window3 shown=" .. tostring(CraftCompassWindow3.shown))
+
 FIRE("GET_ITEM_INFO_RECEIVED")
 FIRE("MODIFIER_STATE_CHANGED")
 return table.concat(out, "\n")
