@@ -9,6 +9,8 @@ All notable changes to Craft Compass. The text of this file goes into each relea
   before and after it in the chain (they open too) and its Wowhead page. Shift-click still links it in chat.
 - With Questie itself loaded, hovering a quest shows Questie's tooltip of it, and the quest's window has an "Open in
   Questie" row for Questie's own window of the quest.
+- The Wowhead address dialog keeps its size: it used to grow wider each time it was opened, until it ran off the
+  screen, and a long address stuck out of its box.
 
 ## 0.4.0 — 2026-11-03
 

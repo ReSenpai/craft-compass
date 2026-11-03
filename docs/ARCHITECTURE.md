@@ -240,9 +240,12 @@ What a row does:
 | Right click, Alt-click, Alt over it | nested window | quest window, nested |
 
 A source row (zones, sold by, quest reward) shows a hint on hover and opens its
-whole list in the nested window on any click. The Wowhead row opens a `StaticPopup` with the address selected for
-Ctrl+C: addons can't open a browser, and `CopyToClipboard` is protected. The edit box puts the address back if it
-is typed over, and Ctrl+C closes the popup the next frame, once the text is copied.
+whole list in the nested window on any click. The Wowhead row opens a small dialog of the addon's own
+(`CraftCompassCopyDialog`) with the address selected for Ctrl+C: addons can't open a browser, and `CopyToClipboard`
+is protected. It isn't a `StaticPopup`: those frames are shared by every popup, and with a wide edit box the popup
+grew a little more each time it was shown. The dialog and its edit box have a fixed width, and a long address
+scrolls inside the box. The edit box puts the address back if it is typed over, and Ctrl+C closes the dialog the
+next frame, once the text is copied.
 
 The address is `https://www.wowhead.com/<site>[/<language>]/<item|spell>=<id>` (`Util.WowheadUrl(kind, id)`):
 

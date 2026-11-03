@@ -34,50 +34,87 @@ stays where it was put.
 ]]
 local windows = {}
 
--- A dialog with a web page's address selected for copying: addons can't open a browser.
-StaticPopupDialogs.CRAFTCOMPASS_COPY_URL = {
-    text = L.CopyUrlHint,
-    button1 = CLOSE,
-    hasEditBox = true,
-    editBoxWidth = 360,
-    OnShow = function (dialog, url)
-        local editBox = dialog.editBox or dialog.EditBox
-        editBox:SetText(url)
-        editBox:HighlightText()
-        editBox:SetFocus()
-        -- Ctrl+C (Cmd+C on a Mac) closes the dialog once the address is copied. Popups share their
-        -- edit boxes, so the hook is added once and checks which dialog it is in.
-        if not editBox.craftCompassCopyHook then
-            editBox.craftCompassCopyHook = true
-            editBox:HookScript("OnKeyDown", function (_, key)
-                local copying = key == "C" and (IsControlKeyDown() or (IsMetaKeyDown and IsMetaKeyDown()))
-                if copying and dialog.which == "CRAFTCOMPASS_COPY_URL" then
-                    -- The next frame, after the edit box has copied the text.
-                    C_Timer.After(0, function ()
-                        StaticPopup_Hide("CRAFTCOMPASS_COPY_URL")
-                    end)
-                end
-            end)
-        end
-    end,
+local COPY_WIDTH = 440
+local copyDialog
+
+--[[
+A small window with a web page's address selected for copying: addons can't open a browser or
+write the clipboard. A frame of its own rather than a StaticPopup: those frames are shared by
+every popup, and a wide edit box made the popup grow a little more each time it was shown.
+]]
+local function CreateCopyDialog()
+    local dialog = CreateFrame("Frame", "CraftCompassCopyDialog", UIParent, BackdropTemplateMixin and "BackdropTemplate")
+    dialog:SetBackdrop({
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+        tile = true,
+        tileSize = 32,
+        edgeSize = 32,
+        insets = {left = 11, right = 12, top = 12, bottom = 11}
+    })
+    dialog:SetSize(COPY_WIDTH, 124)
+    dialog:SetPoint("TOP", 0, -135)
+    dialog:SetFrameStrata("FULLSCREEN_DIALOG")
+    dialog:SetToplevel(true)
+    dialog:EnableMouse(true)
+
+    dialog.text = dialog:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    dialog.text:SetPoint("TOP", 0, -18)
+    dialog.text:SetWidth(COPY_WIDTH - 40)
+    dialog.text:SetText(L.CopyUrlHint)
+
+    -- A long address scrolls inside the box instead of widening anything.
+    local editBox = CreateFrame("EditBox", nil, dialog, "InputBoxTemplate")
+    editBox:SetSize(COPY_WIDTH - 50, 20)
+    editBox:SetPoint("BOTTOM", 0, 46)
+    editBox:SetAutoFocus(false)
     -- The address is there to be copied, not edited.
-    EditBoxOnTextChanged = function (editBox, url)
-        if editBox:GetText() ~= url then
-            editBox:SetText(url)
+    editBox:SetScript("OnTextChanged", function ()
+        if editBox:GetText() ~= dialog.url then
+            editBox:SetText(dialog.url)
             editBox:HighlightText()
         end
-    end,
-    EditBoxOnEnterPressed = function (editBox)
-        editBox:GetParent():Hide()
-    end,
-    EditBoxOnEscapePressed = function (editBox)
-        editBox:GetParent():Hide()
-    end,
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
-    preferredIndex = 3
-}
+    end)
+    editBox:SetScript("OnEnterPressed", function ()
+        dialog:Hide()
+    end)
+    editBox:SetScript("OnEscapePressed", function ()
+        dialog:Hide()
+    end)
+    -- Ctrl+C (Cmd+C on a Mac) closes the dialog the next frame, once the edit box has copied the text.
+    editBox:SetScript("OnKeyDown", function (_, key)
+        if key == "C" and (IsControlKeyDown() or (IsMetaKeyDown and IsMetaKeyDown())) then
+            C_Timer.After(0, function ()
+                dialog:Hide()
+            end)
+        end
+    end)
+    dialog.editBox = editBox
+
+    local close = CreateFrame("Button", nil, dialog, "UIPanelButtonTemplate")
+    close:SetSize(110, 22)
+    close:SetPoint("BOTTOM", 0, 16)
+    close:SetText(CLOSE)
+    close:SetScript("OnClick", function ()
+        dialog:Hide()
+    end)
+
+    -- Escape closes it like the other windows.
+    table.insert(UISpecialFrames, "CraftCompassCopyDialog")
+    dialog:Hide()
+    return dialog
+end
+
+--- Shows a web page's address selected for Ctrl+C.
+local function ShowCopyDialog(url)
+    copyDialog = copyDialog or CreateCopyDialog()
+    copyDialog.url = url
+    copyDialog.editBox:SetText(url)
+    copyDialog:Show()
+    copyDialog:Raise()
+    copyDialog.editBox:SetFocus()
+    copyDialog.editBox:HighlightText()
+end
 
 --- Puts a link into the chat input like Shift-clicking one does, opening the input when it's closed.
 local function InsertChatLink(text)
@@ -146,7 +183,7 @@ local function Row_OnClick(row, button)
     if row.open then
         PinWindow.OpenList(row)
     elseif row.url then
-        StaticPopup_Show("CRAFTCOMPASS_COPY_URL", nil, nil, row.url)
+        ShowCopyDialog(row.url)
     elseif row.action then
         row.action()
     elseif row.quest then

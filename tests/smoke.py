@@ -55,9 +55,7 @@ end
 CreateFrame = function(kind, name) local f = NewFrame(kind, name); if name then _G[name] = f end; return f end
 UIParent = NewFrame("Frame"); UIParent.GetHeight = function() return 1000 end; UIParent.GetRight = function() return 1900 end
 UISpecialFrames = {}
-StaticPopupDialogs = {}
 CLOSE = "Close"
-StaticPopup_Show = function(which, a, b, data) POPUP = which .. " " .. tostring(data) end
 GetSpellDescription = function(id) return "Permanently enchant boots (spell " .. id .. ")." end
 GetBuildInfo = function() return "1.15.9", "1", "Nov 1 2026", 11509 end
 BackdropTemplateMixin = {}
@@ -313,7 +311,10 @@ for _, row in ipairs(CraftCompassWindow1.rows) do
         row.scripts.OnEnter(row)
         dump("hover Wowhead row")
         row.scripts.OnClick(row, "LeftButton")
-        p("wowhead click: " .. tostring(POPUP))
+        p("wowhead click: shown=" .. tostring(CraftCompassCopyDialog.shown) .. " text=" .. tostring(CraftCompassCopyDialog.editBox.text)
+            .. " width=" .. tostring(CraftCompassCopyDialog.w))
+        row.scripts.OnClick(row, "LeftButton")
+        p("again: width=" .. tostring(CraftCompassCopyDialog.w) .. " box=" .. tostring(CraftCompassCopyDialog.editBox.w))
     end
 end
 for _, row in ipairs(CraftCompassWindow1.rows) do
