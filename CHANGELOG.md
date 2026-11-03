@@ -2,7 +2,7 @@
 
 All notable changes to Craft Compass. The text of this file goes into each release's notes.
 
-## 0.4.0 — 2026-11-02
+## 0.4.0 — 2026-11-03
 
 - Drag a nested window away and it stays on its own: closing the window it came from no longer closes it, and that
   window opens its rows in a new nested one.
