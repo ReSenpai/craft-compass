@@ -554,14 +554,15 @@ function Lines.ForQuestWindow(questId)
         table.insert(lines, {spacer = true})
         table.insert(lines, {text = Util.Icon(QUEST_ICON) .. L.QuestItems, color = HEADER_COLOR})
         for _, objective in ipairs(items) do
-            local itemId, needed = objective[1], objective[3] or 1
+            -- QuestieDB mostly has 0 for the count: unknown, it's only in the objectives text.
+            local itemId, needed = objective[1], tonumber(objective[3]) or 0
             local name, link = Util.GetItemInfo(itemId)
             pending = pending or name == nil
             local have = Util.GetItemCount(itemId) or 0
             table.insert(lines, {
                 text = Util.Icon(Util.GetItemIcon(itemId)) .. (name or "..."),
-                right = have .. "/" .. needed,
-                rightColor = have >= needed and ENOUGH_COLOR or nil,
+                right = needed > 0 and (have .. "/" .. needed) or tostring(have),
+                rightColor = needed <= 0 and MUTED_COLOR or have >= needed and ENOUGH_COLOR or nil,
                 link = link
             })
         end

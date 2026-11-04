@@ -2,6 +2,11 @@
 
 All notable changes to Craft Compass. The text of this file goes into each release's notes.
 
+## 0.5.1 — 2026-11-04
+
+- The items a quest's window says to bring no longer show "0/0" marked as done: Questie mostly doesn't know how many
+  a quest asks for (it's in the quest's text), so the window now shows how many you have.
+
 ## 0.5.0 — 2026-11-03
 
 - A click on a quest (or Alt over it, or a right click) opens its window: level and zone, whether it's done or in your
