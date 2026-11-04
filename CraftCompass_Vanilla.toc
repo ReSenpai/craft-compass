@@ -11,6 +11,7 @@
 ## X-Category: Professions
 ## X-License: GPL-3.0-or-later
 ## X-Website: https://github.com/ReSenpai/craft-compass
+## X-Curse-Project-ID: 1782027
 
 Libs\Libs.xml
 
