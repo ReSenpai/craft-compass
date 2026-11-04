@@ -11,6 +11,9 @@ Classic.**
 понятно, что собрать, прежде чем идти к мастеру с просьбой что-нибудь скрафтить. А если это мировой дроп, который не
 нужен ни в рецептах, ни в заданиях, в окне всё равно будет его страница на Wowhead.
 
+[![CurseForge](https://img.shields.io/badge/CurseForge-Craft%20Compass-f16436?logo=curseforge&logoColor=white)](https://www.curseforge.com/projects/1782027)
+[![Загрузки на CurseForge](https://img.shields.io/curseforge/dt/1782027?label=Загрузки&logo=curseforge&logoColor=white)](https://www.curseforge.com/projects/1782027)
+[![Последний релиз](https://img.shields.io/github/v/release/ReSenpai/craft-compass?label=Релиз&logo=github)](https://github.com/ReSenpai/craft-compass/releases/latest)
 [![WoW Classic Era](https://img.shields.io/badge/WoW-Classic%20Era%201.15-c79c6e)](#совместимость)
 [![Лицензия: GPL v3](https://img.shields.io/badge/Лицензия-GPLv3-blue.svg)](LICENSE)
 

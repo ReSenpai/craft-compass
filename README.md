@@ -11,6 +11,9 @@ reagents it needs and how many of them you already carry, and where its recipe c
 gather before you ask a crafter. And for a world drop no recipe or quest needs, the window still has its Wowhead
 page.
 
+[![CurseForge](https://img.shields.io/badge/CurseForge-Craft%20Compass-f16436?logo=curseforge&logoColor=white)](https://www.curseforge.com/projects/1782027)
+[![CurseForge downloads](https://img.shields.io/curseforge/dt/1782027?label=Downloads&logo=curseforge&logoColor=white)](https://www.curseforge.com/projects/1782027)
+[![Latest release](https://img.shields.io/github/v/release/ReSenpai/craft-compass?label=Release&logo=github)](https://github.com/ReSenpai/craft-compass/releases/latest)
 [![WoW Classic Era](https://img.shields.io/badge/WoW-Classic%20Era%201.15-c79c6e)](#compatibility)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
