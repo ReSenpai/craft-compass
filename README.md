@@ -5,10 +5,11 @@ Classic.**
 
 **English** · [Русский](README.ru.md) · [Architecture](docs/ARCHITECTURE.md)
 
-Hover a herb, an ore or a piece of cloth and see every recipe and quest that uses it. Pin that list into a window,
-follow a potion into what *it* is used for, and see for any craftable item which profession makes it, which
+Hover any item and see what it is for: every recipe and quest that uses it, and where to get it. Pin that into a
+window, follow a potion into what *it* is used for, and see for any craftable item which profession makes it, which
 reagents it needs and how many of them you already carry, and where its recipe comes from — so you know what to
-gather before you ask a crafter.
+gather before you ask a crafter. And for a world drop no recipe or quest needs, the window still has its Wowhead
+page.
 
 [![WoW Classic Era](https://img.shields.io/badge/WoW-Classic%20Era%201.15-c79c6e)](#compatibility)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
