@@ -108,7 +108,7 @@ Craft Compass — компас: он показывает направление
 
 | Аддон | | Что даёт |
 | --- | --- | --- |
-| [AtlasLoot Continued](https://www.curseforge.com/wow/addons/atlasloot-continued) или AtlasLoot Classic | обязательно | Рецепты, реагенты и предметы-рецепты |
+| [AtlasLoot Continued](https://www.curseforge.com/wow/addons/atlasloot-continued) (или AtlasLoot Classic) | обязательно | Рецепты, реагенты и предметы-рецепты |
 | [Questie](https://www.curseforge.com/wow/addons/questie) (QuestieDB) | по желанию | Задания и их окна, откуда берётся рецепт |
 
 Своей базы предметов у Craft Compass нет: он читает данные из этих аддонов прямо во время игры, поэтому всегда
@@ -121,6 +121,7 @@ Compass добавляет подробности по Shift или Alt.
 ## Установка
 
 1. **AtlasLoot Continued** (или AtlasLoot Classic) и, по желанию, **Questie** — из приложения CurseForge или вручную, с их страниц.
+   Приложение CurseForge ставит AtlasLoot Continued само, вместе с Craft Compass.
 2. **Craft Compass.** Скачайте `CraftCompass-v<версия>.zip` из [последнего релиза](https://github.com/ReSenpai/craft-compass/releases/latest)
    и распакуйте в `World of Warcraft\_classic_era_\Interface\AddOns` — должна получиться папка
    `Interface\AddOns\CraftCompass` с файлом `CraftCompass_Vanilla.toc` внутри.
@@ -162,6 +163,8 @@ CraftCompass                            — Craft Compass
 
 - Нет рецептов — проверьте, что включён AtlasLoot (Continued или Classic): без него Craft Compass при входе пишет
   об этом в чат и показывает только задания.
+- Craft Compass пишет при входе, что включены AtlasLoot Classic и AtlasLoot Continued, — выключите один из них
+  (лучше оставить Continued): вместе они ломают друг друга.
 - Нет заданий — поставьте Questie.
 - Включите показ ошибок `/console scriptErrors 1` и пришлите текст ошибки в
   [issues](https://github.com/ReSenpai/craft-compass/issues) — с версиями Craft Compass, AtlasLoot и Questie.
@@ -178,7 +181,8 @@ CraftCompass                            — Craft Compass
 - **Classic Forever** — `CraftCompass.toc`, насколько её поддерживают AtlasLoot и Questie.
 - **Язык клиента** — любой; надписи аддона на русском и английском, на остальных языках — на английском.
 
-Рецепты — те, что знает AtlasLoot. Подойдёт любой из них (но только один сразу):
+Рецепты — те, что знает AtlasLoot. Подойдёт любой из них, но только один сразу — вместе они ломают друг друга, и
+Craft Compass при входе напишет об этом в чат:
 
 - [AtlasLoot Continued](https://www.curseforge.com/wow/addons/atlasloot-continued) (папка `AtlasLootContinued`) — рекомендуем: обновляется под Classic Era, TBC
   Anniversary и Forever;

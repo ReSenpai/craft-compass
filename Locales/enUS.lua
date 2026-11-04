@@ -38,3 +38,4 @@ L.OnlyMyProfessionsDesc = "Show recipes only for the professions this character 
 L.ShowCompletedQuests = "Show completed quests"
 L.ShowCompletedQuestsDesc = "List quests this character has already completed (marked as such)."
 L.NoAtlasLoot = "needs AtlasLoot (AtlasLoot Classic or AtlasLoot Continued) for recipes; without it only quests are shown."
+L.TwoAtlasLoots = "AtlasLoot Classic and AtlasLoot Continued are both enabled, and they break each other. Disable one of them (AtlasLoot Continued is the one kept up to date)."

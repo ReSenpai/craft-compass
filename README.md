@@ -105,7 +105,7 @@ Simplified Chinese), in English otherwise, and on Wowhead's Classic or TBC site 
 
 | Addon | | What it gives |
 | --- | --- | --- |
-| [AtlasLoot Continued](https://www.curseforge.com/wow/addons/atlasloot-continued), or AtlasLoot Classic | required | Recipes, reagents and recipe items |
+| [AtlasLoot Continued](https://www.curseforge.com/wow/addons/atlasloot-continued) (or AtlasLoot Classic) | required | Recipes, reagents and recipe items |
 | [Questie](https://www.curseforge.com/wow/addons/questie) (QuestieDB) | optional | Quests and their windows, and where a recipe comes from |
 
 Craft Compass carries no item data of its own: it reads them from these addons while the game runs, so it stays as
@@ -118,6 +118,7 @@ Compass adds the details with Shift or Alt.
 ## Installation
 
 1. Install **AtlasLoot Continued** (or AtlasLoot Classic) and, if you like, **Questie** (from the CurseForge app or their pages).
+   With the CurseForge app, AtlasLoot Continued comes along with Craft Compass.
 2. Download `CraftCompass-v<version>.zip` from the [latest release](https://github.com/ReSenpai/craft-compass/releases/latest)
    and unpack it into `World of Warcraft\_classic_era_\Interface\AddOns`. You should get the folder
    `Interface\AddOns\CraftCompass`.
@@ -136,7 +137,8 @@ To remove it, delete the `Interface\AddOns\CraftCompass` folder.
 - **Burning Crusade Anniversary**: `CraftCompass_TBC.toc`.
 - **Classic Forever**: `CraftCompass.toc`, as far as AtlasLoot and Questie support it.
 
-Recipes are what AtlasLoot knows about. Any of these works, one at a time:
+Recipes are what AtlasLoot knows about. Any of these works, but only one at a time — they break each other, and with
+two enabled Craft Compass says so in chat at login:
 
 - [AtlasLoot Continued](https://www.curseforge.com/wow/addons/atlasloot-continued) (folder `AtlasLootContinued`) — recommended: kept up to date with Classic Era, TBC
   Anniversary and Forever;

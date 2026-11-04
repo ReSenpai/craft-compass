@@ -2,6 +2,12 @@
 
 All notable changes to Craft Compass. The text of this file goes into each release's notes.
 
+## 0.5.3 — 2026-11-04
+
+- With AtlasLoot Classic and AtlasLoot Continued both enabled, Craft Compass says at login, in chat, that they break
+  each other and one of them should be disabled. On CurseForge, AtlasLoot Continued is now the dependency that the
+  CurseForge app installs along with Craft Compass.
+
 ## 0.5.2 — 2026-11-04
 
 - Works with AtlasLoot Continued, the most up to date AtlasLoot for Classic: it installs into its own folder, and

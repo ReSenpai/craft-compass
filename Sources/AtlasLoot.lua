@@ -117,11 +117,26 @@ function Crafts.GetProfession(professionId)
     return Util.GetSpellName(spellId), Util.GetSpellIcon(spellId)
 end
 
+local function IsAddOnLoaded(name)
+    local isLoaded = C_AddOns and C_AddOns.IsAddOnLoaded or _G.IsAddOnLoaded
+    return isLoaded ~= nil and Util.SafeCall(isLoaded, name) and true or false
+end
+
+local function Say(text)
+    if DEFAULT_CHAT_FRAME then
+        DEFAULT_CHAT_FRAME:AddMessage("|cffffd100Craft Compass:|r " .. text)
+    end
+end
+
 ns.OnLogin(function ()
+    -- Both builds set the same global AtlasLoot, so with both enabled one breaks the other.
+    if IsAddOnLoaded("AtlasLootClassic") and IsAddOnLoaded("AtlasLootContinued") then
+        Say(ns.L.TwoAtlasLoots)
+    end
     if Crafts.IsAvailable() then
         finishIndex = Util.RunInBackground(BuildIndex)
-    elseif DEFAULT_CHAT_FRAME then
+    else
         -- AtlasLoot is an optional dependency in the TOC, so that either of its folders loads first.
-        DEFAULT_CHAT_FRAME:AddMessage("|cffffd100Craft Compass:|r " .. ns.L.NoAtlasLoot)
+        Say(ns.L.NoAtlasLoot)
     end
 end)

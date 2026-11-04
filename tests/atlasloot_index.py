@@ -17,6 +17,8 @@ GetSpellTexture = function(id) return id end
 GetSpellInfo = function(id) return "Spell" .. id end
 local passthrough = setmetatable({}, {__index = function(_, k) return k end})
 AtlasLoot = {Data = {}, Locales = passthrough, IngameLocales = passthrough}
+-- AtlasLoot Continued reaches the client's API through its own AtlasLoot.Compat.
+AtlasLoot.Compat = {GetSpellTexture = GetSpellTexture, GetSpellName = GetSpellInfo}
 function AtlasLoot:GetGameVersionDataTable()
     local useTable = {}
     local dataTable = setmetatable({}, {__newindex = function(t, k, v) for k2, v2 in pairs(v) do useTable[k2] = v2 end end})

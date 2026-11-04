@@ -79,7 +79,8 @@ AtlasLoot comes in three builds that share the global `AtlasLoot` and these func
 `AtlasLootContinued`), the maintained AtlasLoot Classic fork and the original AtlasLoot Classic (both in the folder
 `AtlasLootClassic`). So the TOC names both folders under `OptionalDeps`, which only makes them load first: with
 `Dependencies` the game would refuse to load Craft Compass without the one folder named. Without any of them,
-`Crafts.IsAvailable()` is false, there is no craft index, and a line in chat says so at login.
+`Crafts.IsAvailable()` is false, there is no craft index, and a line in chat says so at login. Both folders enabled
+at once break each other (one global), so that gets a line in chat too.
 
 AtlasLoot stores crafts in a private table and looks them up only by spell id:
 

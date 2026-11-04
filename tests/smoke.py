@@ -184,8 +184,13 @@ local out = {}
 local function p(s) out[#out + 1] = tostring(s) end
 local function dump(title) p("--- " .. title); for _, l in ipairs(TOOLTIP_LINES) do p(l) end; TOOLTIP_LINES = {} end
 
+-- Both AtlasLoot builds enabled at once: the login warns about it in chat.
+local chat = {}
+DEFAULT_CHAT_FRAME = {AddMessage = function (_, text) chat[#chat + 1] = text end}
+C_AddOns = {IsAddOnLoaded = function (name) return name == "AtlasLootClassic" or name == "AtlasLootContinued" end}
 FIRE("ADDON_LOADED", "CraftCompass")
 FIRE("PLAYER_LOGIN")
+for _, text in ipairs(chat) do p("chat: " .. text) end
 p("settings.showCompletedQuests=" .. tostring(ns.settings.showCompletedQuests) .. " db=" .. tostring(CraftCompassDB ~= nil))
 p("slash=" .. tostring(SLASH_CRAFTCOMPASS1)); SlashCmdList.CRAFTCOMPASS(""); p("opened=" .. tostring(OPENED))
 
