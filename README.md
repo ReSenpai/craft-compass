@@ -105,7 +105,7 @@ Simplified Chinese), in English otherwise, and on Wowhead's Classic or TBC site 
 
 | Addon | | What it gives |
 | --- | --- | --- |
-| [AtlasLoot Classic](https://www.curseforge.com/wow/addons/atlasloot-classic-fork) | required | Recipes, reagents and recipe items |
+| [AtlasLoot Continued](https://www.curseforge.com/wow/addons/atlasloot-continued), or AtlasLoot Classic | required | Recipes, reagents and recipe items |
 | [Questie](https://www.curseforge.com/wow/addons/questie) (QuestieDB) | optional | Quests and their windows, and where a recipe comes from |
 
 Craft Compass carries no item data of its own: it reads them from these addons while the game runs, so it stays as
@@ -117,12 +117,12 @@ Compass adds the details with Shift or Alt.
 
 ## Installation
 
-1. Install **AtlasLoot Classic** and, if you like, **Questie** (from the CurseForge app or their pages).
+1. Install **AtlasLoot Continued** (or AtlasLoot Classic) and, if you like, **Questie** (from the CurseForge app or their pages).
 2. Download `CraftCompass-v<version>.zip` from the [latest release](https://github.com/ReSenpai/craft-compass/releases/latest)
    and unpack it into `World of Warcraft\_classic_era_\Interface\AddOns`. You should get the folder
    `Interface\AddOns\CraftCompass`.
 3. Restart the game (or `/reload` if it is running) and check on the character screen, under AddOns, that Craft
-   Compass and AtlasLoot Classic are enabled.
+   Compass and AtlasLoot are enabled.
 
 Settings: `/craftcompass` or `/ccompass`, or the AddOns tab of the game options.
 
@@ -136,9 +136,15 @@ To remove it, delete the `Interface\AddOns\CraftCompass` folder.
 - **Burning Crusade Anniversary**: `CraftCompass_TBC.toc`.
 - **Classic Forever**: `CraftCompass.toc`, as far as AtlasLoot and Questie support it.
 
-Recipes are what AtlasLoot Classic knows about. The original AtlasLoot Classic hasn't been updated since 2023; the
-[maintained fork](https://www.curseforge.com/wow/addons/atlasloot-classic-fork) installs into the same folder, is kept up to date with Classic Era, TBC Anniversary and
-Season of Discovery, and has Season of Discovery's own recipes too (shown on Season of Discovery realms only). Either works; the fork is recommended.
+Recipes are what AtlasLoot knows about. Any of these works, one at a time:
+
+- [AtlasLoot Continued](https://www.curseforge.com/wow/addons/atlasloot-continued) (folder `AtlasLootContinued`) — recommended: kept up to date with Classic Era, TBC
+  Anniversary and Forever;
+- [AtlasLoot Classic (fork)](https://www.curseforge.com/wow/addons/atlasloot-classic-fork) (folder `AtlasLootClassic`) — kept up to date as well;
+- the original [AtlasLoot Classic](https://www.curseforge.com/wow/addons/atlaslootclassic) (folder `AtlasLootClassic`) — not updated since 2023.
+
+The first two also have Season of Discovery's own recipes; Craft Compass shows them on Season of Discovery realms
+only.
 
 ## How it works
 
@@ -153,7 +159,7 @@ Season of Discovery, and has Season of Discovery's own recipes too (shown on Sea
 The details, with diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 Checks: `powershell -File tools/test.ps1` parses the Lua files, runs a smoke test against stubbed game and addon
-APIs in English and Russian, and builds the craft index over an installed AtlasLoot Classic (needs Python with
+APIs in English and Russian, and builds the craft index over an installed AtlasLoot (needs Python with
 `lupa` and `luaparser`, e.g. `pip install --target .tools/pylib lupa luaparser`).
 
 Releases: raise `## Version` in the three TOC files and add a section for it to `CHANGELOG.md`; once that is on

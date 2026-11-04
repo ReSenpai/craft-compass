@@ -6,8 +6,7 @@
 ## Version: 0.5.2
 ## IconTexture: Interface\Icons\INV_Misc_Spyglass_03
 ## SavedVariables: CraftCompassDB
-## Dependencies: AtlasLootClassic
-## OptionalDeps: QuestieDB, Questie
+## OptionalDeps: AtlasLootClassic, AtlasLootContinued, QuestieDB, Questie
 ## X-Category: Professions
 ## X-License: GPL-3.0-or-later
 ## X-Website: https://github.com/ReSenpai/craft-compass

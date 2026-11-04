@@ -120,5 +120,8 @@ end
 ns.OnLogin(function ()
     if Crafts.IsAvailable() then
         finishIndex = Util.RunInBackground(BuildIndex)
+    elseif DEFAULT_CHAT_FRAME then
+        -- AtlasLoot is an optional dependency in the TOC, so that either of its folders loads first.
+        DEFAULT_CHAT_FRAME:AddMessage("|cffffd100Craft Compass:|r " .. ns.L.NoAtlasLoot)
     end
 end)

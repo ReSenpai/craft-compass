@@ -108,7 +108,7 @@ Craft Compass — компас: он показывает направление
 
 | Аддон | | Что даёт |
 | --- | --- | --- |
-| [AtlasLoot Classic](https://www.curseforge.com/wow/addons/atlasloot-classic-fork) | обязательно | Рецепты, реагенты и предметы-рецепты |
+| [AtlasLoot Continued](https://www.curseforge.com/wow/addons/atlasloot-continued) или AtlasLoot Classic | обязательно | Рецепты, реагенты и предметы-рецепты |
 | [Questie](https://www.curseforge.com/wow/addons/questie) (QuestieDB) | по желанию | Задания и их окна, откуда берётся рецепт |
 
 Своей базы предметов у Craft Compass нет: он читает данные из этих аддонов прямо во время игры, поэтому всегда
@@ -120,17 +120,17 @@ Compass добавляет подробности по Shift или Alt.
 
 ## Установка
 
-1. **AtlasLoot Classic** и, по желанию, **Questie** — из приложения CurseForge или вручную, с их страниц.
+1. **AtlasLoot Continued** (или AtlasLoot Classic) и, по желанию, **Questie** — из приложения CurseForge или вручную, с их страниц.
 2. **Craft Compass.** Скачайте `CraftCompass-v<версия>.zip` из [последнего релиза](https://github.com/ReSenpai/craft-compass/releases/latest)
    и распакуйте в `World of Warcraft\_classic_era_\Interface\AddOns` — должна получиться папка
    `Interface\AddOns\CraftCompass` с файлом `CraftCompass_Vanilla.toc` внутри.
 3. Перезапустите игру (или `/reload`, если она уже открыта) и проверьте, что в списке модификаций на экране выбора
-   персонажа включены Craft Compass и AtlasLoot Classic.
+   персонажа включены Craft Compass и AtlasLoot.
 
 В итоге в `Interface\AddOns` должно быть:
 
 ```
-AtlasLootClassic, AtlasLootClassic_*   — AtlasLoot Classic
+AtlasLootContinued, AtlasLootContinued_* — AtlasLoot Continued (или AtlasLootClassic*)
 Questie                                 — Questie (по желанию)
 CraftCompass                            — Craft Compass
 ```
@@ -160,7 +160,8 @@ CraftCompass                            — Craft Compass
 
 ### Если что-то не работает
 
-- Ничего не появляется по Shift — проверьте, что включён AtlasLoot Classic: без него аддон не загрузится.
+- Нет рецептов — проверьте, что включён AtlasLoot (Continued или Classic): без него Craft Compass при входе пишет
+  об этом в чат и показывает только задания.
 - Нет заданий — поставьте Questie.
 - Включите показ ошибок `/console scriptErrors 1` и пришлите текст ошибки в
   [issues](https://github.com/ReSenpai/craft-compass/issues) — с версиями Craft Compass, AtlasLoot и Questie.
@@ -177,9 +178,15 @@ CraftCompass                            — Craft Compass
 - **Classic Forever** — `CraftCompass.toc`, насколько её поддерживают AtlasLoot и Questie.
 - **Язык клиента** — любой; надписи аддона на русском и английском, на остальных языках — на английском.
 
-Рецепты — те, что знает AtlasLoot Classic. Оригинальный AtlasLoot Classic не обновлялся с 2023 года;
-[поддерживаемый форк](https://www.curseforge.com/wow/addons/atlasloot-classic-fork) ставится в ту же папку, обновляется под Classic Era, TBC Anniversary и Season of
-Discovery и знает собственные рецепты Season of Discovery (они показываются только на серверах Season of Discovery). Подойдёт любой, рекомендуем форк.
+Рецепты — те, что знает AtlasLoot. Подойдёт любой из них (но только один сразу):
+
+- [AtlasLoot Continued](https://www.curseforge.com/wow/addons/atlasloot-continued) (папка `AtlasLootContinued`) — рекомендуем: обновляется под Classic Era, TBC
+  Anniversary и Forever;
+- [AtlasLoot Classic (fork)](https://www.curseforge.com/wow/addons/atlasloot-classic-fork) (папка `AtlasLootClassic`) — тоже обновляется;
+- оригинальный [AtlasLoot Classic](https://www.curseforge.com/wow/addons/atlaslootclassic) (папка `AtlasLootClassic`) — не обновлялся с 2023 года.
+
+В первых двух есть и собственные рецепты Season of Discovery; Craft Compass показывает их только на серверах Season of
+Discovery.
 
 Как аддон устроен внутри — в [docs/ARCHITECTURE.ru.md](docs/ARCHITECTURE.ru.md).
 

@@ -8,7 +8,8 @@
 
 ## Принципы
 
-- **Своих данных нет.** Крафты берутся из AtlasLoot Classic (обязателен), задания и источники рецептов — из QuestieDB
+- **Своих данных нет.** Крафты берутся из AtlasLoot (обязателен: AtlasLoot Continued либо AtlasLoot Classic или
+  его форк), задания и источники рецептов — из QuestieDB
   (необязателен, входит в Questie). Оба читаются во время игры. Craft Compass только строит по ним индексы и вызывает
   их открытые функции, поэтому он настолько полон и свеж, насколько полны и свежи они.
 - **Всё по id.** Предметы, заклинания, задания, NPC и зоны ищутся по id, а не по названию. Поэтому аддон работает
@@ -41,7 +42,7 @@
 
 ```mermaid
 flowchart TD
-    AL[(AtlasLoot Classic)] --> Crafts[Sources/AtlasLoot.lua<br>ns.Crafts]
+    AL[(AtlasLoot)] --> Crafts[Sources/AtlasLoot.lua<br>ns.Crafts]
     QDB[(QuestieDB)] --> Quests[Sources/Questie.lua<br>ns.Quests]
     Quests --> Gathering[Sources/Gathering.lua<br>ns.Gathering]
     Gathering --> Lines
@@ -74,6 +75,12 @@ flowchart TD
 ## Источники данных
 
 ### Крафты (`Sources/AtlasLoot.lua`)
+
+AtlasLoot бывает в трёх сборках с общим глобальным `AtlasLoot` и этими функциями: AtlasLoot Continued (папка
+`AtlasLootContinued`), поддерживаемый форк AtlasLoot Classic и оригинальный AtlasLoot Classic (оба в папке
+`AtlasLootClassic`). Поэтому в TOC обе папки указаны в `OptionalDeps` — это только заставляет их загрузиться раньше:
+с `Dependencies` игра не загрузила бы Craft Compass без той единственной папки. Если нет ни одной, `Crafts.IsAvailable()`
+ложно, индекса крафтов нет, а при входе в чат пишется об этом.
 
 AtlasLoot хранит крафты в закрытой таблице и ищет их только по id заклинания:
 
@@ -336,7 +343,7 @@ sequenceDiagram
   - `tools/release_check.py` — версии в трёх TOC и CHANGELOG совпадают;
   - `tests/smoke.py` (enUS и ruRU) — загружает аддон в Lua (lupa) на заглушках клиента, AtlasLoot и QuestieDB
     и проходит подсказки, окна, вложенность, Alt+щелчок в чате и закрытие;
-  - `tests/atlasloot_index.py` — строит индекс крафтов по настоящим данным установленного AtlasLoot Classic.
+  - `tests/atlasloot_index.py` — строит индекс крафтов по настоящим данным установленного AtlasLoot (любой из папок).
 - `.github/workflows/release.yml` — push в `main` с новой `## Version` (и разделом CHANGELOG для неё): прогоняет
   проверки, ставит тег `v<версия>` и собирает zip через BigWigs packager. Zip уходит в GitHub Release, а на
   CurseForge — когда там будет создан проект. `.pkgmeta` не пускает в zip `docs/`, `tests/`, `tools/` и служебные

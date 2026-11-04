@@ -30,8 +30,11 @@ geterrorhandler = function() return error end
 """)
 load = lua.eval("function(code, name, ...) return assert(load(code, '@' .. name))(...) end")
 private = lua.eval("{IS_CLASSIC = true}")
+# AtlasLoot Continued and AtlasLoot Classic (with its fork) differ only in the folder.
+FOLDER = next(name for name in ("AtlasLootContinued", "AtlasLootClassic") if (ADDONS / name).is_dir())
+print("AtlasLoot folder:", FOLDER)
 for f in ("Data/Profession.lua", "Data/Recipe.lua"):
-    load((ADDONS / "AtlasLootClassic" / f).read_text(encoding="utf-8"), f, "AtlasLootClassic", private)
+    load((ADDONS / FOLDER / f).read_text(encoding="utf-8"), f, FOLDER, private)
 lua.execute("INIT()")
 
 ns = lua.eval("{}")

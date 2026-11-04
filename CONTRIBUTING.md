@@ -19,7 +19,7 @@ mklink /J "C:\Program Files (x86)\World of Warcraft\_classic_era_\Interface\AddO
 ```
 
 - `Core/` — start-up and settings, the lines shown in tooltips and windows, the options panel.
-- `Sources/` — reading crafts from AtlasLoot Classic and quests from QuestieDB.
+- `Sources/` — reading crafts from AtlasLoot and quests from QuestieDB.
 - `UI/` — the tooltip hooks and the pinned windows.
 - `Locales/` — the addon's own text.
 - `Libs/` — the Ace3 libraries behind the options panel.
@@ -29,7 +29,7 @@ How the modules fit together is described in [docs/ARCHITECTURE.md](docs/ARCHITE
 
 ## Data
 
-Craft Compass ships no item, recipe or quest data: everything comes from AtlasLoot Classic and QuestieDB while the
+Craft Compass ships no item, recipe or quest data: everything comes from AtlasLoot and QuestieDB while the
 game runs. A missing or wrong recipe or quest is usually best fixed in those addons. Please don't add data tables
 copied from other addons or websites.
 

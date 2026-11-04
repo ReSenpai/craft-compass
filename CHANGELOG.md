@@ -4,9 +4,13 @@ All notable changes to Craft Compass. The text of this file goes into each relea
 
 ## 0.5.2 — 2026-11-04
 
-- Season of Discovery recipes on Season of Discovery realms, with the maintained fork of AtlasLoot Classic (it
-  installs into the same folder as the original, which hasn't been updated since 2023). Their spells have ids the
-  craft index didn't reach; on other realms they stay out, though the fork lists them with Classic Era's.
+- Works with AtlasLoot Continued, the most up to date AtlasLoot for Classic: it installs into its own folder, and
+  Craft Compass used to require the folder of AtlasLoot Classic. AtlasLoot Classic and its maintained fork still work;
+  the original hasn't been updated since 2023. Without any AtlasLoot, Craft Compass now loads anyway, shows quests and
+  says in chat that recipes need AtlasLoot.
+- Season of Discovery recipes on Season of Discovery realms, with AtlasLoot Continued or the AtlasLoot Classic fork.
+  Their spells have ids the craft index didn't reach; on other realms they stay out, though AtlasLoot lists them with
+  Classic Era's.
 
 ## 0.5.1 — 2026-11-04
 

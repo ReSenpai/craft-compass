@@ -7,7 +7,8 @@ happens on each click. For setting up the repository and running the checks, see
 
 ## Principles
 
-- **No data of its own.** Crafts come from AtlasLoot Classic (required), quests and recipe sources from QuestieDB
+- **No data of its own.** Crafts come from AtlasLoot (required: AtlasLoot Continued, or AtlasLoot Classic and its
+  fork), quests and recipe sources from QuestieDB
   (optional, part of Questie). Both are read while the game runs. Craft Compass only indexes them and calls their
   public functions, so it is as complete and up to date as they are.
 - **Everything by id.** Items, spells, quests, NPCs and zones are looked up by id, never by name. That is why the
@@ -40,7 +41,7 @@ The files load in the order the TOC lists them. Each one is a module on the shar
 
 ```mermaid
 flowchart TD
-    AL[(AtlasLoot Classic)] --> Crafts[Sources/AtlasLoot.lua<br>ns.Crafts]
+    AL[(AtlasLoot)] --> Crafts[Sources/AtlasLoot.lua<br>ns.Crafts]
     QDB[(QuestieDB)] --> Quests[Sources/Questie.lua<br>ns.Quests]
     Quests --> Gathering[Sources/Gathering.lua<br>ns.Gathering]
     Gathering --> Lines
@@ -73,6 +74,12 @@ yields every so often. It returns a *finish* function that runs the rest at once
 ## Data sources
 
 ### Crafts (`Sources/AtlasLoot.lua`)
+
+AtlasLoot comes in three builds that share the global `AtlasLoot` and these functions: AtlasLoot Continued (folder
+`AtlasLootContinued`), the maintained AtlasLoot Classic fork and the original AtlasLoot Classic (both in the folder
+`AtlasLootClassic`). So the TOC names both folders under `OptionalDeps`, which only makes them load first: with
+`Dependencies` the game would refuse to load Craft Compass without the one folder named. Without any of them,
+`Crafts.IsAvailable()` is false, there is no craft index, and a line in chat says so at login.
 
 AtlasLoot stores crafts in a private table and looks them up only by spell id:
 
@@ -326,7 +333,7 @@ The API differences between them sit in `Util` (`C_Item` / `C_Spell` vs. the glo
   - `tools/release_check.py` — the versions in the three TOC files and the CHANGELOG agree;
   - `tests/smoke.py` (enUS and ruRU) — loads the addon in Lua (lupa) over stubs of the client, AtlasLoot and
     QuestieDB and goes through tooltips, windows, nesting, chat Alt-click and closing;
-  - `tests/atlasloot_index.py` — builds the craft index over the real data of an installed AtlasLoot Classic.
+  - `tests/atlasloot_index.py` — builds the craft index over the real data of an installed AtlasLoot (either folder).
 - `.github/workflows/release.yml` — a push to `main` with a new `## Version` (and a CHANGELOG section for it):
   runs the checks, tags `v<version>` and builds the zip with the BigWigs packager. The zip goes to a GitHub Release,
   and to CurseForge once the project is set up there. `.pkgmeta` keeps `docs/`, `tests/`, `tools/` and the
