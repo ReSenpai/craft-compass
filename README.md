@@ -13,10 +13,10 @@ gather before you ask a crafter.
 [![WoW Classic Era](https://img.shields.io/badge/WoW-Classic%20Era%201.15-c79c6e)](#compatibility)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
-![Someone links a leather armour in chat: Alt-click it, and the window shows what it takes; hovering Shadow Oil shows how that is made](docs/images/chat-crafted-item.png)
+![Someone links Mithril Scale Gloves in chat: Alt-click it, and the window shows what the craft takes; hovering Mithril Bar shows how that is made](docs/images/chat-crafted-item.png)
 
-*Someone offers to craft a piece of armour: Alt-click its link in chat, see the reagents, and hover the one you don't
-know where to get. Screenshots are from a Russian client.*
+*Someone offers to craft a pair of gloves: Alt-click the link in chat, see the reagents, and hover the one you don't
+know where to get.*
 
 ## What does it do?
 
@@ -25,21 +25,25 @@ know where to get. Screenshots are from a Russian client.*
 Hold **Shift** (or Ctrl) over an item: the recipes it goes into, by profession and skill with how many of it each
 takes, and the quests that ask for it, the completed ones marked.
 
-![Shift over Briarthorn: the alchemy recipes that use it](docs/images/shift-tooltip.png)
+![Shift over Refreshing Spring Water in the bag: where to get it, the cooking and engineering recipes and the quest that use it](docs/images/shift-tooltip.png)
 
 ### Pinned windows
 
 Hold **Alt** over an item to pin that list into a window that stays on screen. Hover a row for its tooltip, click it
 for the item window, **Shift-click** to link it in chat. Long lists scroll; Escape closes them all.
 
-![A pinned window for Briarthorn; Healing Potion hovered in it shows what it takes and what it is used for](docs/images/pinned-window.png)
+![A pinned window for Refreshing Spring Water; Thistle Tea hovered in it shows what it takes and where its recipe comes from](docs/images/pinned-window.png)
 
 Alt over a row (or Alt-click, or a right click) opens a nested window beside it, as deep as you like: from a herb to
 the elixir made of it to the belt made of that. An enchant opens the same way: what it does, what it takes and where
 its formula comes from. A nested window closes with the one it came from, unless you drag it away: then it stays on
 its own.
 
-![Three nested windows: Briarthorn, Elixir of Wisdom, Hillman's Belt](docs/images/nested-windows.png)
+![Nested windows: Refreshing Spring Water, the Thistle Tea made with it, and the Swiftthistle the tea needs, with Holy Protection Potion hovered](docs/images/nested-windows.png)
+
+| An enchant | A window dragged away |
+| --- | --- |
+| ![Silverleaf and the enchant Imbue Chest - Minor Spirit opened from it: what it does, what it takes and its formula](docs/images/enchant-window.png) | ![A nested window dragged away stays on screen after the windows it came from are closed](docs/images/detached-window.png) |
 
 ### Items from chat
 
@@ -48,7 +52,7 @@ as usual, with what the craft takes added and a reminder that Alt-click lets you
 
 | Alt-click a link | A plain click |
 | --- | --- |
-| ![Alt-click on a link in chat opens a pinned window](docs/images/chat-alt-click.png) | ![A plain click on a link in chat opens the game's item window](docs/images/chat-click.png) |
+| ![Alt-click on a link to Refreshing Spring Water in chat opens a pinned window](docs/images/chat-alt-click.png) | ![A plain click on the link opens the game's item window, with where to get the item](docs/images/chat-click.png) |
 
 ### What a craft takes
 
@@ -57,7 +61,7 @@ that make it, every reagent with how many you have (bags and bank) against how m
 taught by the trainer, or the recipe item with who sells it and which quest rewards it. In a pinned window the
 reagents open in nested windows like any other row, so you can follow an oil or a thread back to where it comes from.
 
-![The item window of Swiftness Potion: alchemy, its reagents and its recipe](docs/images/item-window.png)
+![A click on Holy Protection Potion in the Swiftthistle window opens its item window: alchemy, the reagents, the recipe and who sells it](docs/images/item-window.png)
 
 ### Where to get it
 
@@ -66,6 +70,10 @@ the skill it needs and the zones where it grows most; leather and hides show the
 who sells the item and which quest rewards it. In a pinned window each of these lines is clickable and opens the
 whole list: every vendor with their level and zone, every zone, the richest first.
 
+| The zones of a herb | Every vendor |
+| --- | --- |
+| ![Swiftthistle: Herb Gathering 50 and the zones, the whole list opened beside it](docs/images/where-to-get.png) | ![Every vendor of Refreshing Spring Water with their level and zone](docs/images/vendors.png) |
+
 Craft Compass is a compass: it points you the right way, it isn't a database. It doesn't say which creatures drop an
 item or which chests it is found in: the data addons have on that comes from private-server databases and is too
 often wrong. For that, the last row of a pinned window is the item's (or the enchant's) Wowhead page: click it and
@@ -73,12 +81,17 @@ press Ctrl+C: the address is copied and the dialog closes (addons can't open a b
 is in your client's language where Wowhead has it (German, Spanish, French, Italian, Portuguese, Russian, Korean,
 Simplified Chinese), in English otherwise, and on Wowhead's Classic or TBC site to match your game.
 
+![The Wowhead row of Elixir of Lion's Strength and the dialog with the address ready for Ctrl+C](docs/images/wowhead.png)
+
 ### And also
 
 - **Quest windows.** Click a quest in a pinned window (or Alt over it) for its own window: level, zone and whether
   it's done, what it says to do, who gives it and who takes it back, the items to bring, the quests before and after
   it, and its Wowhead page. With Questie itself loaded, hovering a quest shows Questie's tooltip, and an "Open in
   Questie" row opens Questie's window of it.
+
+  ![The quest Elixirs for the Bladeleafs opened from Elixir of Lion's Strength: what it asks, who gives it, what to bring; Questie's tooltip beside it](docs/images/quest-window.png)
+
 - **Quests in chat.** Shift-click a quest in a pinned window to link it in chat, in the `[Name (id)]` form Questie
   turns into a clickable quest link.
 - **Any client language.** Everything is looked up by id, and item, quest, profession and zone names come in the
@@ -108,6 +121,8 @@ Compass adds the details with Shift or Alt.
    Compass and AtlasLoot Classic are enabled.
 
 Settings: `/craftcompass` or `/ccompass`, or the AddOns tab of the game options.
+
+![The settings: only my professions, show completed quests](docs/images/options.png)
 
 To remove it, delete the `Interface\AddOns\CraftCompass` folder.
 
