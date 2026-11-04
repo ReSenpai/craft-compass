@@ -108,7 +108,7 @@ Craft Compass — компас: он показывает направление
 
 | Аддон | | Что даёт |
 | --- | --- | --- |
-| [AtlasLoot Classic](https://www.curseforge.com/wow/addons/atlaslootclassic) | обязательно | Рецепты, реагенты и предметы-рецепты |
+| [AtlasLoot Classic](https://www.curseforge.com/wow/addons/atlasloot-classic-fork) | обязательно | Рецепты, реагенты и предметы-рецепты |
 | [Questie](https://www.curseforge.com/wow/addons/questie) (QuestieDB) | по желанию | Задания и их окна, откуда берётся рецепт |
 
 Своей базы предметов у Craft Compass нет: он читает данные из этих аддонов прямо во время игры, поэтому всегда
@@ -177,7 +177,9 @@ CraftCompass                            — Craft Compass
 - **Classic Forever** — `CraftCompass.toc`, насколько её поддерживают AtlasLoot и Questie.
 - **Язык клиента** — любой; надписи аддона на русском и английском, на остальных языках — на английском.
 
-Рецепты — те, что знает AtlasLoot Classic; собственных рецептов Season of Discovery в нём нет.
+Рецепты — те, что знает AtlasLoot Classic. Оригинальный AtlasLoot Classic не обновлялся с 2023 года;
+[поддерживаемый форк](https://www.curseforge.com/wow/addons/atlasloot-classic-fork) ставится в ту же папку, обновляется под Classic Era, TBC Anniversary и Season of
+Discovery и знает собственные рецепты Season of Discovery (они показываются только на серверах Season of Discovery). Подойдёт любой, рекомендуем форк.
 
 Как аддон устроен внутри — в [docs/ARCHITECTURE.ru.md](docs/ARCHITECTURE.ru.md).
 

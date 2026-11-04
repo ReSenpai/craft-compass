@@ -105,7 +105,7 @@ Simplified Chinese), in English otherwise, and on Wowhead's Classic or TBC site 
 
 | Addon | | What it gives |
 | --- | --- | --- |
-| [AtlasLoot Classic](https://www.curseforge.com/wow/addons/atlaslootclassic) | required | Recipes, reagents and recipe items |
+| [AtlasLoot Classic](https://www.curseforge.com/wow/addons/atlasloot-classic-fork) | required | Recipes, reagents and recipe items |
 | [Questie](https://www.curseforge.com/wow/addons/questie) (QuestieDB) | optional | Quests and their windows, and where a recipe comes from |
 
 Craft Compass carries no item data of its own: it reads them from these addons while the game runs, so it stays as
@@ -136,7 +136,9 @@ To remove it, delete the `Interface\AddOns\CraftCompass` folder.
 - **Burning Crusade Anniversary**: `CraftCompass_TBC.toc`.
 - **Classic Forever**: `CraftCompass.toc`, as far as AtlasLoot and Questie support it.
 
-Recipes are what AtlasLoot Classic knows about; Season of Discovery's own recipes aren't in it.
+Recipes are what AtlasLoot Classic knows about. The original AtlasLoot Classic hasn't been updated since 2023; the
+[maintained fork](https://www.curseforge.com/wow/addons/atlasloot-classic-fork) installs into the same folder, is kept up to date with Classic Era, TBC Anniversary and
+Season of Discovery, and has Season of Discovery's own recipes too (shown on Season of Discovery realms only). Either works; the fork is recommended.
 
 ## How it works
 

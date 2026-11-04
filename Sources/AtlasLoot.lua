@@ -12,7 +12,10 @@ ns.Crafts = Crafts
 -- Craft spells go up to about 30000 in Classic Era and 51000 in TBC, but the Anniversary
 -- client added a few around 351000. A lookup is cheap, so the whole range is searched.
 local MAX_CRAFT_SPELL_ID = 400000
-local SPELLS_PER_STEP = 10000
+-- The maintained AtlasLoot fork has Season of Discovery recipes from about 426000 to 1232000,
+-- in the same table as Classic Era's: they are indexed only on a Season of Discovery realm.
+local MAX_SOD_CRAFT_SPELL_ID = 1300000
+local SPELLS_PER_STEP = 25000
 
 -- The spell each of AtlasLoot's profession ids is named after, for the localized name and icon.
 local PROFESSION_SPELLS = {
@@ -55,9 +58,16 @@ function Crafts.Get(spellId)
     return profession and Util.SafeCall(profession.GetProfessionData, spellId)
 end
 
+local function IsSeasonOfDiscovery()
+    local sod = Enum and Enum.SeasonID and Enum.SeasonID.SeasonOfDiscovery
+    return sod ~= nil and C_Seasons ~= nil and C_Seasons.GetActiveSeason ~= nil
+        and Util.SafeCall(C_Seasons.GetActiveSeason) == sod
+end
+
 local function BuildIndex()
     local getCraft = GetDataModule("Profession").GetProfessionData
-    for spellId = 1, MAX_CRAFT_SPELL_ID do
+    local last = IsSeasonOfDiscovery() and MAX_SOD_CRAFT_SPELL_ID or MAX_CRAFT_SPELL_ID
+    for spellId = 1, last do
         local craft = getCraft(spellId)
         if craft then
             if craft[1] and not spellByCreatedItem[craft[1]] then

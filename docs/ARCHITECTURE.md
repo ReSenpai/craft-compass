@@ -81,8 +81,10 @@ AtlasLoot stores crafts in a private table and looks them up only by spell id:
 - `AtlasLoot.Data.Recipe.GetRecipeForSpell(spellId)` → the recipe item, or nil when a trainer teaches it.
 
 To find crafts *by item*, the index goes over spell ids 1 to 400 000 once (Classic Era crafts end near 30 000, TBC
-near 51 000, and the Anniversary client added a few near 351 000). It yields every 10 000 ids; the whole pass takes
-about 11 ms. It builds two tables:
+near 51 000, and the Anniversary client added a few near 351 000). The maintained AtlasLoot fork keeps Season of
+Discovery's recipes, from about 426 000 to 1 232 000, in the same table as Classic Era's, so on a Season of Discovery
+realm (`C_Seasons.GetActiveSeason()`) the pass goes on to 1 300 000, and elsewhere they stay out. It yields every
+25 000 ids; the whole pass takes about 11 ms, a few dozen on Season of Discovery. It builds two tables:
 
 - `spellsByReagent[itemId]` — the craft spells that use the item;
 - `spellByCreatedItem[itemId]` — the craft spell that makes the item (the first one found).
