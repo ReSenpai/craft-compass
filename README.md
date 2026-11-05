@@ -83,7 +83,7 @@ item or which chests it is found in: the data addons have on that comes from pri
 often wrong. For that, the last row of a pinned window is the item's (or the enchant's) Wowhead page: click it and
 press Ctrl+C: the address is copied and the dialog closes (addons can't open a browser or copy by themselves). The page
 is in your client's language where Wowhead has it (German, Spanish, French, Italian, Portuguese, Russian, Korean,
-Simplified Chinese), in English otherwise, and on Wowhead's Classic or TBC site to match your game.
+Simplified Chinese), in English otherwise, and on Wowhead's Classic, TBC or Forever site to match your game.
 
 ![The Wowhead row of Elixir of Lion's Strength and the dialog with the address ready for Ctrl+C](docs/images/wowhead.png)
 

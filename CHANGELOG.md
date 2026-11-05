@@ -2,6 +2,11 @@
 
 All notable changes to Craft Compass. The text of this file goes into each release's notes.
 
+## 0.5.4 — 2026-11-05
+
+- On World of Warcraft: Forever, the Wowhead row now leads to Wowhead's Forever pages (`wowhead.com/forever/...`)
+  instead of the Classic ones.
+
 ## 0.5.3 — 2026-11-04
 
 - With AtlasLoot Classic and AtlasLoot Continued both enabled, Craft Compass says at login, in chat, that they break

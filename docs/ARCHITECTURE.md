@@ -259,8 +259,8 @@ next frame, once the text is copied.
 
 The address is `https://www.wowhead.com/<site>[/<language>]/<item|spell>=<id>` (`Util.WowheadUrl(kind, id)`):
 
-- **Site:** `tbc` for a client with interface 20000–29999, `classic` for the rest (Classic Era, Season of
-  Discovery and the 16001 client).
+- **Site:** `tbc` for a client with interface 20000–29999; `forever` for Forever (interface 16000–19999, a retail
+  number, or the Mainline project it reports); `classic` for the rest (Classic Era and Season of Discovery).
 - **Language:** by `GetLocale()`: `deDE` → `de`, `esES` and `esMX` → `es`, `frFR` → `fr`, `itIT` → `it`, `ptBR` → `pt`,
   `ruRU` → `ru`, `koKR` → `ko`, `zhCN` → `cn`. English clients and languages Wowhead doesn't have (`zhTW`) get no
   language folder, which is the English page.

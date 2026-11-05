@@ -267,8 +267,8 @@ Questie стирают их у 24 самых частых трав и жил (о
 
 Адрес — `https://www.wowhead.com/<раздел>[/<язык>]/<item|spell>=<id>` (`Util.WowheadUrl(kind, id)`):
 
-- **Раздел:** `tbc` для клиента с интерфейсом 20000–29999, `classic` для остальных (Classic Era, Season of Discovery
-  и клиент 16001).
+- **Раздел:** `tbc` для клиента с интерфейсом 20000–29999; `forever` для Forever (интерфейс 16000–19999, номер
+  retail или проект Mainline, которым он себя называет); `classic` для остальных (Classic Era и Season of Discovery).
 - **Язык:** по `GetLocale()`: `deDE` → `de`, `esES` и `esMX` → `es`, `frFR` → `fr`, `itIT` → `it`, `ptBR` → `pt`,
   `ruRU` → `ru`, `koKR` → `ko`, `zhCN` → `cn`. Английские клиенты и языки, которых у Wowhead нет (`zhTW`), получают
   адрес без папки языка — это английская страница.

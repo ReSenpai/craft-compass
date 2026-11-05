@@ -191,6 +191,14 @@ C_AddOns = {IsAddOnLoaded = function (name) return name == "AtlasLootClassic" or
 FIRE("ADDON_LOADED", "CraftCompass")
 FIRE("PLAYER_LOGIN")
 for _, text in ipairs(chat) do p("chat: " .. text) end
+
+-- The Wowhead site follows the client: Classic Era, TBC Anniversary, Forever.
+local realBuildInfo = GetBuildInfo
+for _, interface in ipairs({11509, 20505, 16001, 120100}) do
+    GetBuildInfo = function() return "", "", "", interface end
+    p("wowhead " .. interface .. ": " .. ns.Util.WowheadUrl("item", 8827))
+end
+GetBuildInfo = realBuildInfo
 p("settings.showCompletedQuests=" .. tostring(ns.settings.showCompletedQuests) .. " db=" .. tostring(CraftCompassDB ~= nil))
 p("slash=" .. tostring(SLASH_CRAFTCOMPASS1)); SlashCmdList.CRAFTCOMPASS(""); p("opened=" .. tostring(OPENED))
 

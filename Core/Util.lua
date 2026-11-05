@@ -104,8 +104,15 @@ local WOWHEAD_LANGUAGES = {
 
 --- A page on Wowhead (kind "item", "spell" or "quest"), for the client's game version and language.
 function Util.WowheadUrl(kind, id)
-    local interface = select(4, GetBuildInfo())
-    local site = (interface >= 20000 and interface < 30000) and "tbc" or "classic"
+    local interface = select(4, GetBuildInfo()) or 0
+    local site = "classic"
+    if interface >= 20000 and interface < 30000 then
+        site = "tbc"
+    elseif (interface >= 16000 and interface < 20000) or interface >= 100000
+        or (WOW_PROJECT_ID ~= nil and WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) then
+        -- Forever (1.60) runs on the modern client, which may report a retail interface and the Mainline project.
+        site = "forever"
+    end
     local language = WOWHEAD_LANGUAGES[GetLocale()]
     return "https://www.wowhead.com/" .. site .. (language and "/" .. language or "") .. "/" .. kind .. "=" .. id
 end
