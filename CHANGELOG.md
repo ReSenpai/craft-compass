@@ -2,6 +2,13 @@
 
 All notable changes to Craft Compass. The text of this file goes into each release's notes.
 
+## 0.5.5 — 2026-11-06
+
+- Using an item from an action bar no longer gets blocked with "CraftCompass has been blocked from an action only
+  available to the Blizzard UI". Pressing Shift, Ctrl or Alt over an action button used to redraw its tooltip by
+  entering the button from addon code, which made the game treat its next click as the addon's; now only the tooltip
+  is set again.
+
 ## 0.5.4 — 2026-11-05
 
 - On World of Warcraft: Forever, the Wowhead row now leads to Wowhead's Forever pages (`wowhead.com/forever/...`)

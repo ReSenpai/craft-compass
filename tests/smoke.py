@@ -405,6 +405,17 @@ p("first closed: window3 shown=" .. tostring(CraftCompassWindow3.shown))
 
 FIRE("GET_ITEM_INFO_RECEIVED")
 FIRE("MODIFIER_STATE_CHANGED")
+
+-- Shift over an item on an action button: its secure OnEnter must not be called, or its click gets blocked.
+local actionButton = CreateFrame("CheckButton")
+actionButton.action = 7
+actionButton.IsProtected = function() return true end
+actionButton.IsMouseOver = function() return true end
+actionButton:SetScript("OnEnter", function() p("action button OnEnter called (taints it)") end)
+GameTooltip.SetAction = function(_, slot) p("tooltip set again from action " .. slot) end
+GameTooltip.owner, GameTooltip.shown = actionButton, true
+GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(2318)
+FIRE("MODIFIER_STATE_CHANGED")
 return table.concat(out, "\n")
 """)
 print(result)

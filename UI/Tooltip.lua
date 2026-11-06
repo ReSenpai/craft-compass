@@ -85,13 +85,30 @@ local function OnTooltipSetItem(tooltip)
     end
 end
 
---- Draws the hovered tooltip again by entering the frame it belongs to once more.
+--[[
+Draws the hovered tooltip again by entering the frame it belongs to once more. A secure frame,
+such as an action button, is never entered: what its OnEnter writes into it would then come from
+addon code, and the game would block the button's next click as the addon's. Its tooltip is set
+again directly instead.
+]]
 local function RefreshHovered()
     if not GameTooltip:IsShown() then
         return
     end
     local owner = GameTooltip:GetOwner()
-    local onEnter = owner and owner.IsMouseOver and owner:IsMouseOver() and owner:GetScript("OnEnter")
+    if not (owner and owner.IsMouseOver and owner:IsMouseOver()) then
+        return
+    end
+    if owner.IsProtected and owner:IsProtected() then
+        local _, link = GameTooltip:GetItem()
+        if type(owner.action) == "number" and GameTooltip.SetAction then
+            GameTooltip:SetAction(owner.action)
+        elseif link then
+            GameTooltip:SetHyperlink(Util.LinkData(link))
+        end
+        return
+    end
+    local onEnter = owner:GetScript("OnEnter")
     if onEnter then
         onEnter(owner)
     end

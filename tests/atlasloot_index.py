@@ -26,7 +26,8 @@ function AtlasLoot:GetGameVersionDataTable()
 end
 function AtlasLoot:AddInitFunc(f) INIT = f end
 function AtlasLoot:GameVersion_GE(v) return v == "BC" end
-AtlasLoot.BC_VERSION_NUM = "BC"; AtlasLoot.WRATH_VERSION_NUM = "WRATH"
+function AtlasLoot:GameVersion_EQ(v) return false end
+AtlasLoot.BC_VERSION_NUM = "BC"; AtlasLoot.WRATH_VERSION_NUM = "WRATH"; AtlasLoot.FOREVER_VERSION_NUM = "FOREVER"
 C_Timer = {NewTicker = function() return {Cancel = function() end} end}
 geterrorhandler = function() return error end
 """)
