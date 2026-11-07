@@ -143,9 +143,11 @@ two enabled Craft Compass says so in chat at login:
 - [AtlasLoot Continued](https://www.curseforge.com/wow/addons/atlasloot-continued) (folder `AtlasLootContinued`) — recommended: kept up to date with Classic Era, TBC
   Anniversary and Forever;
 - [AtlasLoot Classic (fork)](https://www.curseforge.com/wow/addons/atlasloot-classic-fork) (folder `AtlasLootClassic`) — kept up to date as well;
-- the original [AtlasLoot Classic](https://www.curseforge.com/wow/addons/atlaslootclassic) (folder `AtlasLootClassic`) — not updated since 2023.
+- the original [AtlasLoot Classic](https://www.curseforge.com/wow/addons/atlaslootclassic) (folder `AtlasLootClassic`) — not updated since 2023;
+- [AtlasLoot Forever](https://www.curseforge.com/wow/addons/atlasloot-forever) (folder `AtlasLootClassic`) — for Forever's phases and
+  best-in-slot lists, without Forever's own recipes.
 
-The first two also have Season of Discovery's own recipes; Craft Compass shows them on Season of Discovery realms
+AtlasLoot Continued also has Forever's own recipes. The first two also have Season of Discovery's own recipes; Craft Compass shows them on Season of Discovery realms
 only.
 
 ## How it works

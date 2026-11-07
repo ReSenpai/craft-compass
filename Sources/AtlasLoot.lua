@@ -155,6 +155,24 @@ local function IsAddOnLoaded(name)
     return isLoaded ~= nil and Util.SafeCall(isLoaded, name) and true or false
 end
 
+--[[
+The name an addon has in the game's AddOns list, without its icon, colours and a note such as
+"[Core]": AtlasLoot Forever and the original AtlasLoot Classic share one folder.
+]]
+local function AddOnTitle(name)
+    local getInfo = C_AddOns and C_AddOns.GetAddOnInfo or _G.GetAddOnInfo
+    local ok, _, title = false, nil, nil
+    if getInfo then
+        ok, _, title = pcall(getInfo, name)
+    end
+    if not ok or type(title) ~= "string" then
+        return name
+    end
+    title = title:gsub("|T.-|t", ""):gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("%[.-%]", "")
+    title = title:match("^%s*(.-)%s*$")
+    return title ~= "" and title or name
+end
+
 local function Say(text)
     if DEFAULT_CHAT_FRAME then
         DEFAULT_CHAT_FRAME:AddMessage("|cffffd100Craft Compass:|r " .. text)
@@ -164,7 +182,7 @@ end
 ns.OnLogin(function ()
     -- Both builds set the same global AtlasLoot, so with both enabled one breaks the other.
     if IsAddOnLoaded("AtlasLootClassic") and IsAddOnLoaded("AtlasLootContinued") then
-        Say(ns.L.TwoAtlasLoots)
+        Say(ns.L.TwoAtlasLoots:format(AddOnTitle("AtlasLootClassic"), AddOnTitle("AtlasLootContinued")))
     end
     if Crafts.IsAvailable() then
         finishIndex = Util.RunInBackground(BuildIndex)

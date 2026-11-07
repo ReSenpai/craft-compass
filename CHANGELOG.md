@@ -2,6 +2,12 @@
 
 All notable changes to Craft Compass. The text of this file goes into each release's notes.
 
+## 0.5.7 — 2026-11-07
+
+- The warning about two AtlasLoots enabled at once names them as the game's AddOns list does. On Forever that is
+  AtlasLoot Forever, which installs into the same folder as AtlasLoot Classic and breaks AtlasLoot Continued the
+  same way.
+
 ## 0.5.6 — 2026-11-07
 
 - World of Warcraft: Forever's own recipes (with AtlasLoot Continued): an item now shows the Forever crafts that use

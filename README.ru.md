@@ -163,7 +163,7 @@ CraftCompass                            — Craft Compass
 
 - Нет рецептов — проверьте, что включён AtlasLoot (Continued или Classic): без него Craft Compass при входе пишет
   об этом в чат и показывает только задания.
-- Craft Compass пишет при входе, что включены AtlasLoot Classic и AtlasLoot Continued, — выключите один из них
+- Craft Compass пишет при входе, что включены два AtlasLoot (например, AtlasLoot Forever и AtlasLoot Continued), — выключите один из них
   (лучше оставить Continued): вместе они ломают друг друга.
 - Нет заданий — поставьте Questie.
 - Включите показ ошибок `/console scriptErrors 1` и пришлите текст ошибки в
@@ -187,9 +187,11 @@ Craft Compass при входе напишет об этом в чат:
 - [AtlasLoot Continued](https://www.curseforge.com/wow/addons/atlasloot-continued) (папка `AtlasLootContinued`) — рекомендуем: обновляется под Classic Era, TBC
   Anniversary и Forever;
 - [AtlasLoot Classic (fork)](https://www.curseforge.com/wow/addons/atlasloot-classic-fork) (папка `AtlasLootClassic`) — тоже обновляется;
-- оригинальный [AtlasLoot Classic](https://www.curseforge.com/wow/addons/atlaslootclassic) (папка `AtlasLootClassic`) — не обновлялся с 2023 года.
+- оригинальный [AtlasLoot Classic](https://www.curseforge.com/wow/addons/atlaslootclassic) (папка `AtlasLootClassic`) — не обновлялся с 2023 года;
+- [AtlasLoot Forever](https://www.curseforge.com/wow/addons/atlasloot-forever) (папка `AtlasLootClassic`) — про фазы и BiS-списки
+  Forever, без собственных рецептов Forever.
 
-В первых двух есть и собственные рецепты Season of Discovery; Craft Compass показывает их только на серверах Season of
+У AtlasLoot Continued есть и собственные рецепты Forever. В первых двух есть и собственные рецепты Season of Discovery; Craft Compass показывает их только на серверах Season of
 Discovery.
 
 Как аддон устроен внутри — в [docs/ARCHITECTURE.ru.md](docs/ARCHITECTURE.ru.md).

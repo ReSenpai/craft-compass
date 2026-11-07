@@ -41,4 +41,4 @@ L.OnlyMyProfessionsDesc = "Показывать рецепты только те
 L.ShowCompletedQuests = "Показывать выполненные задания"
 L.ShowCompletedQuestsDesc = "Показывать задания, которые персонаж уже выполнил (с пометкой)."
 L.NoAtlasLoot = "для рецептов нужен AtlasLoot (AtlasLoot Classic или AtlasLoot Continued); без него показываются только задания."
-L.TwoAtlasLoots = "включены сразу AtlasLoot Classic и AtlasLoot Continued, а вместе они ломают друг друга. Выключите один из них (обновляется AtlasLoot Continued)."
+L.TwoAtlasLoots = "включены сразу %s и %s, а вместе они ломают друг друга. Выключите один из них: Craft Compass работает с любым, а больше всего рецептов у AtlasLoot Continued."

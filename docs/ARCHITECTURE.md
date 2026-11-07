@@ -75,12 +75,13 @@ yields every so often. It returns a *finish* function that runs the rest at once
 
 ### Crafts (`Sources/AtlasLoot.lua`)
 
-AtlasLoot comes in three builds that share the global `AtlasLoot` and these functions: AtlasLoot Continued (folder
-`AtlasLootContinued`), the maintained AtlasLoot Classic fork and the original AtlasLoot Classic (both in the folder
-`AtlasLootClassic`). So the TOC names both folders under `OptionalDeps`, which only makes them load first: with
+AtlasLoot comes in four builds that share the global `AtlasLoot` and these functions: AtlasLoot Continued (folder
+`AtlasLootContinued`), the maintained AtlasLoot Classic fork, the original AtlasLoot Classic and AtlasLoot Forever (all
+three in the folder `AtlasLootClassic`). So the TOC names both folders under `OptionalDeps`, which only makes them load first: with
 `Dependencies` the game would refuse to load Craft Compass without the one folder named. Without any of them,
 `Crafts.IsAvailable()` is false, there is no craft index, and a line in chat says so at login. Both folders enabled
-at once break each other (one global), so that gets a line in chat too.
+at once break each other (one global), so that gets a line in chat too, naming both by their titles in the AddOns
+list (`GetAddOnInfo`, without icon, colours and "[Core]").
 
 AtlasLoot stores crafts in a private table and looks them up only by spell id:
 

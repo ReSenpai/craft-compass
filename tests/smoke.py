@@ -187,7 +187,17 @@ local function dump(title) p("--- " .. title); for _, l in ipairs(TOOLTIP_LINES)
 -- Both AtlasLoot builds enabled at once: the login warns about it in chat.
 local chat = {}
 DEFAULT_CHAT_FRAME = {AddMessage = function (_, text) chat[#chat + 1] = text end}
-C_AddOns = {IsAddOnLoaded = function (name) return name == "AtlasLootClassic" or name == "AtlasLootContinued" end}
+C_AddOns = {
+    IsAddOnLoaded = function (name) return name == "AtlasLootClassic" or name == "AtlasLootContinued" end,
+    -- AtlasLoot Forever in the AtlasLootClassic folder: the warning names it as the AddOns list does.
+    GetAddOnInfo = function (name)
+        local titles = {
+            AtlasLootClassic = "|TInterface\\AddOns\\AtlasLootClassic\\atlas_tga:16|t AtlasLoot Forever |cFF22B14C[Core]|r",
+            AtlasLootContinued = "AtlasLoot Continued |cFF22B14C[Core]|r"
+        }
+        return name, titles[name]
+    end
+}
 FIRE("ADDON_LOADED", "CraftCompass")
 FIRE("PLAYER_LOGIN")
 for _, text in ipairs(chat) do p("chat: " .. text) end

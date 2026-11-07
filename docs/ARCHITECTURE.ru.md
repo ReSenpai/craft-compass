@@ -76,12 +76,13 @@ flowchart TD
 
 ### Крафты (`Sources/AtlasLoot.lua`)
 
-AtlasLoot бывает в трёх сборках с общим глобальным `AtlasLoot` и этими функциями: AtlasLoot Continued (папка
-`AtlasLootContinued`), поддерживаемый форк AtlasLoot Classic и оригинальный AtlasLoot Classic (оба в папке
-`AtlasLootClassic`). Поэтому в TOC обе папки указаны в `OptionalDeps` — это только заставляет их загрузиться раньше:
+AtlasLoot бывает в четырёх сборках с общим глобальным `AtlasLoot` и этими функциями: AtlasLoot Continued (папка
+`AtlasLootContinued`), поддерживаемый форк AtlasLoot Classic, оригинальный AtlasLoot Classic и AtlasLoot Forever (все
+три в папке `AtlasLootClassic`). Поэтому в TOC обе папки указаны в `OptionalDeps` — это только заставляет их загрузиться раньше:
 с `Dependencies` игра не загрузила бы Craft Compass без той единственной папки. Если нет ни одной, `Crafts.IsAvailable()`
 ложно, индекса крафтов нет, а при входе в чат пишется об этом. Обе папки сразу ломают друг друга (глобальная
-переменная одна) — об этом при входе тоже пишется в чат.
+переменная одна) — об этом при входе тоже пишется в чат, с названиями обоих из списка модификаций (`GetAddOnInfo`,
+без значка, цвета и «[Core]»).
 
 AtlasLoot хранит крафты в закрытой таблице и ищет их только по id заклинания:
 
