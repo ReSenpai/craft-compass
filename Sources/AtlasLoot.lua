@@ -15,6 +15,9 @@ local MAX_CRAFT_SPELL_ID = 400000
 -- The maintained AtlasLoot fork has Season of Discovery recipes from about 426000 to 1232000,
 -- in the same table as Classic Era's: they are indexed only on a Season of Discovery realm.
 local MAX_SOD_CRAFT_SPELL_ID = 1300000
+-- AtlasLoot Continued has Forever's own recipes from about 1225000 to 1329000. Season of
+-- Discovery's are in that range too, but their spells don't exist on the Forever client.
+local MAX_FOREVER_CRAFT_SPELL_ID = 1400000
 local SPELLS_PER_STEP = 25000
 
 -- The spell each of AtlasLoot's profession ids is named after, for the localized name and icon.
@@ -66,9 +69,18 @@ end
 
 local function BuildIndex()
     local getCraft = GetDataModule("Profession").GetProfessionData
-    local last = IsSeasonOfDiscovery() and MAX_SOD_CRAFT_SPELL_ID or MAX_CRAFT_SPELL_ID
+    local forever = Util.IsForever()
+    local last = MAX_CRAFT_SPELL_ID
+    if forever then
+        last = MAX_FOREVER_CRAFT_SPELL_ID
+    elseif IsSeasonOfDiscovery() then
+        last = MAX_SOD_CRAFT_SPELL_ID
+    end
     for spellId = 1, last do
         local craft = getCraft(spellId)
+        if craft and forever and spellId > MAX_CRAFT_SPELL_ID and not Util.GetSpellName(spellId) then
+            craft = nil
+        end
         if craft then
             if craft[1] and not spellByCreatedItem[craft[1]] then
                 spellByCreatedItem[craft[1]] = spellId

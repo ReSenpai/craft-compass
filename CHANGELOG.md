@@ -2,6 +2,14 @@
 
 All notable changes to Craft Compass. The text of this file goes into each release's notes.
 
+## 0.5.6 — 2026-11-07
+
+- World of Warcraft: Forever's own recipes (with AtlasLoot Continued): an item now shows the Forever crafts that use
+  it, and a Forever-made item what it takes. Season of Discovery's recipes, which AtlasLoot keeps beside them, stay
+  out.
+- "Only my professions" works on clients without the old skill list (as Forever may be): it asks the character's
+  professions instead, and with neither it hides nothing rather than raising an error.
+
 ## 0.5.5 — 2026-11-06
 
 - Using an item from an action bar no longer gets blocked with "CraftCompass has been blocked from an action only

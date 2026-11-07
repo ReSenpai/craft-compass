@@ -102,29 +102,58 @@ local WOWHEAD_LANGUAGES = {
     deDE = "de", esES = "es", esMX = "es", frFR = "fr", itIT = "it", ptBR = "pt", ruRU = "ru", koKR = "ko", zhCN = "cn"
 }
 
+local function GetInterface()
+    return select(4, GetBuildInfo()) or 0
+end
+
+local function IsTBC()
+    local interface = GetInterface()
+    return interface >= 20000 and interface < 30000
+end
+
+--- Whether this is World of Warcraft: Forever (1.60). It runs on the modern client, which may
+--- report a retail interface and the Mainline project.
+function Util.IsForever()
+    local interface = GetInterface()
+    return (interface >= 16000 and interface < 20000) or interface >= 100000
+        or (WOW_PROJECT_ID ~= nil and WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
+end
+
 --- A page on Wowhead (kind "item", "spell" or "quest"), for the client's game version and language.
 function Util.WowheadUrl(kind, id)
-    local interface = select(4, GetBuildInfo()) or 0
     local site = "classic"
-    if interface >= 20000 and interface < 30000 then
+    if IsTBC() then
         site = "tbc"
-    elseif (interface >= 16000 and interface < 20000) or interface >= 100000
-        or (WOW_PROJECT_ID ~= nil and WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) then
-        -- Forever (1.60) runs on the modern client, which may report a retail interface and the Mainline project.
+    elseif Util.IsForever() then
         site = "forever"
     end
     local language = WOWHEAD_LANGUAGES[GetLocale()]
     return "https://www.wowhead.com/" .. site .. (language and "/" .. language or "") .. "/" .. kind .. "=" .. id
 end
 
---- Whether the character has a skill line with this (localized) name.
+--[[
+Whether the character has a skill line with this (localized) name. The modern client (Forever)
+may lack the skill line list; there the professions are asked for instead, and with neither
+nothing is filtered out.
+]]
 function Util.HasSkill(name)
-    for i = 1, GetNumSkillLines() do
-        if GetSkillLineInfo(i) == name then
-            return true
+    if GetNumSkillLines and GetSkillLineInfo then
+        for i = 1, GetNumSkillLines() do
+            if GetSkillLineInfo(i) == name then
+                return true
+            end
         end
+        return false
     end
-    return false
+    if GetProfessions and GetProfessionInfo then
+        for _, index in pairs({GetProfessions()}) do
+            if GetProfessionInfo(index) == name then
+                return true
+            end
+        end
+        return false
+    end
+    return true
 end
 
 function Util.IsQuestCompleted(questId)

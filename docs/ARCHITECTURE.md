@@ -91,8 +91,11 @@ AtlasLoot stores crafts in a private table and looks them up only by spell id:
 To find crafts *by item*, the index goes over spell ids 1 to 400 000 once (Classic Era crafts end near 30 000, TBC
 near 51 000, and the Anniversary client added a few near 351 000). The maintained AtlasLoot fork keeps Season of
 Discovery's recipes, from about 426 000 to 1 232 000, in the same table as Classic Era's, so on a Season of Discovery
-realm (`C_Seasons.GetActiveSeason()`) the pass goes on to 1 300 000, and elsewhere they stay out. It yields every
-25 000 ids; the whole pass takes about 11 ms, a few dozen on Season of Discovery. It builds two tables:
+realm (`C_Seasons.GetActiveSeason()`) the pass goes on to 1 300 000, and elsewhere they stay out. AtlasLoot Continued
+has Forever's own recipes too, from about 1 225 000 to 1 329 000, so on Forever (`Util.IsForever()`) the pass goes on
+to 1 400 000; Season of Discovery's recipes share that range, and past 400 000 a craft is kept only when the client
+knows its spell, which Forever's doesn't for Season of Discovery. It yields every 25 000 ids; the whole pass takes
+about 11 ms, a few dozen on Season of Discovery and Forever. It builds two tables:
 
 - `spellsByReagent[itemId]` — the craft spells that use the item;
 - `spellByCreatedItem[itemId]` — the craft spell that makes the item (the first one found).

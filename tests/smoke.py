@@ -199,6 +199,16 @@ for _, interface in ipairs({11509, 20505, 16001, 120100}) do
     p("wowhead " .. interface .. ": " .. ns.Util.WowheadUrl("item", 8827))
 end
 GetBuildInfo = realBuildInfo
+
+-- A client without the skill line list (Forever) asks the professions instead.
+local numSkillLines, skillLineInfo = GetNumSkillLines, GetSkillLineInfo
+GetNumSkillLines, GetSkillLineInfo = nil, nil
+GetProfessions = function() return 3, nil, nil, 5 end
+GetProfessionInfo = function(index) return ({[3] = "Leatherworking", [5] = "Cooking"})[index] end
+p("HasSkill by professions: Leatherworking=" .. tostring(ns.Util.HasSkill("Leatherworking")) .. " Alchemy=" .. tostring(ns.Util.HasSkill("Alchemy")))
+GetProfessions, GetProfessionInfo = nil, nil
+p("HasSkill with neither: Alchemy=" .. tostring(ns.Util.HasSkill("Alchemy")))
+GetNumSkillLines, GetSkillLineInfo = numSkillLines, skillLineInfo
 p("settings.showCompletedQuests=" .. tostring(ns.settings.showCompletedQuests) .. " db=" .. tostring(CraftCompassDB ~= nil))
 p("slash=" .. tostring(SLASH_CRAFTCOMPASS1)); SlashCmdList.CRAFTCOMPASS(""); p("opened=" .. tostring(OPENED))
 
