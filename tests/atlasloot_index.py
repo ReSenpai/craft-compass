@@ -93,6 +93,11 @@ if "PROFESSION_DATA.FOREVER = {" in PROFESSION_FILE:
     print("Forever: Prowler Steak (238637) <- spell", crafts.ForCreatedItem(238637))
     print("Forever: Tender Wolf Meat (12202) is a reagent in", len(crafts.ForReagent(12202)), "crafts")
     print("Forever: Light Leather (2318) is a reagent in", len(crafts.ForReagent(2318)), "crafts")
+    # Forever moved the healing potions to First Aid with new spells, which replace Alchemy's.
+    spell = crafts.ForCreatedItem(118)
+    print("Forever: Minor Healing Potion (118) <- spell", spell, "profession", crafts.Get(spell)[2])
+    print("Forever: Peacebloom (2447) crafts include Alchemy's 2330:", 2330 in list(crafts.ForReagent(2447).values()),
+          "and First Aid's 1244431:", 1244431 in list(crafts.ForReagent(2447).values()))
     late_sod = [i for i in sod_spell_ids() if i > 1225000]
     indexed = [i for i in late_sod if crafts.Get(i) and crafts.ForCreatedItem(crafts.Get(i)[1]) == i]
     print(f"Forever: Season of Discovery spells past 1225000: {len(late_sod)}, indexed {len(indexed)}")

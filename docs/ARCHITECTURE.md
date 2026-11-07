@@ -94,7 +94,9 @@ Discovery's recipes, from about 426 000 to 1 232 000, in the same table as Class
 realm (`C_Seasons.GetActiveSeason()`) the pass goes on to 1 300 000, and elsewhere they stay out. AtlasLoot Continued
 has Forever's own recipes too, from about 1 225 000 to 1 329 000, so on Forever (`Util.IsForever()`) the pass goes on
 to 1 400 000; Season of Discovery's recipes share that range, and past 400 000 a craft is kept only when the client
-knows its spell, which Forever's doesn't for Season of Discovery. It yields every 25 000 ids; the whole pass takes
+knows its spell, which Forever's doesn't for Season of Discovery. Forever also made six healing potions anew, in
+First Aid instead of Alchemy; AtlasLoot keeps both spells, and there a Forever spell that makes the same item as a
+Classic one replaces it in both tables. It yields every 25 000 ids; the whole pass takes
 about 11 ms, a few dozen on Season of Discovery and Forever. It builds two tables:
 
 - `spellsByReagent[itemId]` — the craft spells that use the item;

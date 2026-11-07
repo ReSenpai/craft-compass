@@ -76,14 +76,23 @@ local function BuildIndex()
     elseif IsSeasonOfDiscovery() then
         last = MAX_SOD_CRAFT_SPELL_ID
     end
+    -- Forever made a few items anew, such as the healing potions now in First Aid: AtlasLoot keeps
+    -- the Classic spell beside the Forever one, which replaces it.
+    local replaced = {}
     for spellId = 1, last do
         local craft = getCraft(spellId)
-        if craft and forever and spellId > MAX_CRAFT_SPELL_ID and not Util.GetSpellName(spellId) then
+        local isForeverSpell = forever and spellId > MAX_CRAFT_SPELL_ID
+        if craft and isForeverSpell and not Util.GetSpellName(spellId) then
             craft = nil
         end
         if craft then
-            if craft[1] and not spellByCreatedItem[craft[1]] then
-                spellByCreatedItem[craft[1]] = spellId
+            local createdItemId = craft[1]
+            local previous = createdItemId and spellByCreatedItem[createdItemId]
+            if createdItemId and (not previous or isForeverSpell and previous <= MAX_CRAFT_SPELL_ID) then
+                if previous then
+                    replaced[previous] = true
+                end
+                spellByCreatedItem[createdItemId] = spellId
             end
             for _, reagentId in ipairs(craft[6] or {}) do
                 spellsByReagent[reagentId] = spellsByReagent[reagentId] or {}
@@ -92,6 +101,18 @@ local function BuildIndex()
         end
         if spellId % SPELLS_PER_STEP == 0 then
             coroutine.yield()
+        end
+    end
+    if next(replaced) then
+        for reagentId, spells in pairs(spellsByReagent) do
+            for i = #spells, 1, -1 do
+                if replaced[spells[i]] then
+                    table.remove(spells, i)
+                end
+            end
+            if #spells == 0 then
+                spellsByReagent[reagentId] = nil
+            end
         end
     end
 end
