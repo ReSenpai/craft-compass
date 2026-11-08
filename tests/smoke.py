@@ -65,9 +65,11 @@ GetLocale = function() return LOCALE end
 UnitRace = function() return "Human", "Human", 1 end
 UnitClass = function() return "Warrior", "WARRIOR", 1 end
 UnitFactionGroup = function() return "Alliance" end
+LOCALIZED_CLASS_NAMES_MALE = {MAGE = "Mage", PRIEST = "Priest"}
+RAID_CLASS_COLORS = {MAGE = {r = 0.25, g = 0.78, b = 0.92}}
 GetNumSkillLines = function() return 1 end
 GetSkillLineInfo = function() return "Leatherworking" end
-local names = {[2318] = "Light Leather", [2320] = "Coarse Thread", [2302] = "Handstitched Leather Boots", [9999] = "Pattern: Boots", [13463] = "Dreamfoil"}
+local names = {[2318] = "Light Leather", [2320] = "Coarse Thread", [2302] = "Handstitched Leather Boots", [9999] = "Pattern: Boots", [13463] = "Dreamfoil", [17056] = "Light Feather", [17031] = "Rune of Teleportation"}
 GetItemInfo = function(id) if names[id] then return names[id], "|cffffffff|Hitem:" .. id .. "::::|h[" .. names[id] .. "]|h|r" end end
 GetItemIcon = function(id) return 134000 + id end
 GetItemCount = function(id) return id == 2318 and 5 or 0 end
@@ -236,6 +238,14 @@ dump("shift over Light Leather")
 GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(13463)
 GameTooltip.scripts.OnTooltipSetItem(GameTooltip)
 dump("shift over Dreamfoil")
+
+-- Class reagents: the classes and their spells, a mage's teleports only for the character's faction
+GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(17056)
+GameTooltip.scripts.OnTooltipSetItem(GameTooltip)
+dump("shift over Light Feather")
+GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(17031)
+GameTooltip.scripts.OnTooltipSetItem(GameTooltip)
+dump("shift over Rune of Teleportation")
 
 -- Shift over the boots: craft info and uses
 GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(2302)

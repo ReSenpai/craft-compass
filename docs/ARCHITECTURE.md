@@ -34,6 +34,7 @@ The files load in the order the TOC lists them. Each one is a module on the shar
 | `Sources/AtlasLoot.lua` | `ns.Crafts` | Crafts: reagent → craft spells, created item → craft spell, recipe items. |
 | `Sources/Questie.lua` | `ns.Quests` | Quests by item, quest/NPC/zone names, item sources, chat links. |
 | `Sources/Gathering.lua` | `ns.Gathering` | Gathered resources: profession, skill, zones of their herbs and veins. |
+| `Sources/ClassReagents.lua` | `ns.ClassReagents` | Reagents of class spells: class and spell by item. |
 | `Core/Lines.lua` | `ns.Lines` | Builds the lines: what an item is used for, what a craft takes, where an item comes from. |
 | `UI/PinWindow.lua` | `ns.PinWindow` | Pinned windows, nested windows, chat Alt-click. |
 | `UI/Tooltip.lua` | `ns.Tooltip` | Tooltip hooks, modifier keys, redrawing when names arrive. |
@@ -45,6 +46,7 @@ flowchart TD
     QDB[(QuestieDB)] --> Quests[Sources/Questie.lua<br>ns.Quests]
     Quests --> Gathering[Sources/Gathering.lua<br>ns.Gathering]
     Gathering --> Lines
+    ClassReagents[Sources/ClassReagents.lua<br>ns.ClassReagents] --> Lines
     Crafts --> Lines[Core/Lines.lua<br>ns.Lines]
     Quests --> Lines
     Settings[Core/Init.lua<br>ns.settings] --> Lines
@@ -142,8 +144,8 @@ through `Util.SafeCall`, so a change in their API doesn't break tooltips.
 
 ### Gathering (`Sources/Gathering.lua`)
 
-Neither AtlasLoot nor QuestieDB knows which skill a herb, a vein or a hide needs, so this is the one table of game
-facts the addon keeps itself:
+Neither AtlasLoot nor QuestieDB knows which skill a herb, a vein or a hide needs, so this is one of the two tables of
+game facts the addon keeps itself (the other is class reagents, below):
 
 - `NODES` — herbs and veins by their English name: profession and skill (Dreamfoil → Herbalism 270);
 - `ITEM_NODES` — which of them each resource comes from (Thorium Ore and Dense Stone → the four thorium veins);
@@ -155,6 +157,14 @@ give. So after login the index goes over every object once (250 per step) and ke
 and sorts the zones, most points first; the counts only set the order and are not shown, since they come from an
 emulator's database and don't match the live realms. The spawn points are read with `GetRaw` too: Questie's corrections clear
 them for the 24 most common herbs and veins (Briarthorn, copper...), which it never draws on the map.
+
+### Class reagents (`Sources/ClassReagents.lua`)
+
+Neither source knows which class spells take a reagent either, so `REAGENTS` lists them by item id: `{class, spell
+id}`, with `rank` where each rank takes its own reagent (a druid's seeds), `faction` for a spell one faction has (a
+mage's teleports and portals) and `tbc` for one from Burning Crusade. `ClassReagents.ForItem` leaves out the other
+faction's spells and, outside TBC, the TBC ones. Class names and colours come from `LOCALIZED_CLASS_NAMES_MALE` and
+`RAID_CLASS_COLORS`, spell names from the client, so all of it is in the client's language.
 
 ## The line model (`Core/Lines.lua`)
 
@@ -176,7 +186,8 @@ A line is a table:
 Builders return `lines, pending`, where `pending` means some item names weren't cached yet:
 
 - `Lines.ForItemUses(itemId)` — the recipes the item goes into, grouped by profession (sorted by name), each sorted by
-  skill, with the reagent count. Then the quests that ask for it, for this race and class, sorted by level, completed
+  skill, with the reagent count. Then the class spells it is a reagent of, by class (the character's first), each
+  a spell link with its rank where the rank matters. Then the quests that ask for it, for this race and class, sorted by level, completed
   ones marked. Settings filter both. When there is nothing, it says nothing: the sources don't know every use.
 - `Lines.ForCraft(spellId)` — profession and skill, each reagent with *have/need* (bags and bank, green when enough),
   then the recipe: "trainer", or the recipe item with up to two vendors (the player's faction first) and quest

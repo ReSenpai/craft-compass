@@ -16,7 +16,7 @@ Builders return the lines and whether some item names weren't cached yet, in whi
 caller draws them again once GET_ITEM_INFO_RECEIVED brings them.
 ]]
 local _, ns = ...
-local L, Util, Crafts, Quests, Gathering = ns.L, ns.Util, ns.Crafts, ns.Quests, ns.Gathering
+local L, Util, Crafts, Quests, Gathering, ClassReagents = ns.L, ns.Util, ns.Crafts, ns.Quests, ns.Gathering, ns.ClassReagents
 
 local Lines = {}
 ns.Lines = Lines
@@ -95,6 +95,45 @@ local function AddRecipeUses(lines, itemId)
     return #sorted > 0, pending
 end
 
+--- The class spells an item is a reagent of, by class, the character's class first.
+local function AddClassUses(lines, itemId)
+    local classes = {}
+    local sorted = {}
+    for _, use in ipairs(ClassReagents.ForItem(itemId)) do
+        local class = classes[use.class]
+        if not class then
+            local name, color = ClassReagents.GetClass(use.class)
+            class = {id = use.class, name = name, color = color, spells = {}}
+            classes[use.class] = class
+            table.insert(sorted, class)
+        end
+        table.insert(class.spells, use)
+    end
+    local _, playerClass = UnitClass("player")
+    table.sort(sorted, function (a, b)
+        if (a.id == playerClass) ~= (b.id == playerClass) then
+            return a.id == playerClass
+        end
+        return a.name < b.name
+    end)
+
+    for _, class in ipairs(sorted) do
+        table.insert(lines, {spacer = true})
+        table.insert(lines, {text = class.name, color = class.color or HEADER_COLOR})
+        for _, use in ipairs(class.spells) do
+            local link = Util.GetSpellLink(use.spellId)
+            if link then
+                table.insert(lines, {
+                    text = Util.Icon(Util.GetSpellIcon(use.spellId)) .. link,
+                    right = use.rank and L.Rank:format(use.rank),
+                    rightColor = MUTED_COLOR,
+                    link = link
+                })
+            end
+        end
+    end
+end
+
 --- The quests that ask for an item, for this character's race and class.
 local function AddQuestUses(lines, itemId)
     local quests = {}
@@ -132,12 +171,14 @@ local function AddQuestUses(lines, itemId)
 end
 
 --[[
-What an item is used for: the recipes it goes into and the quests that ask for it. Nothing found
-says nothing: the sources don't know every use, so "not used" would be a guess.
+What an item is used for: the recipes it goes into, the class spells it is a reagent of and the
+quests that ask for it. Nothing found says nothing: the sources don't know every use, so "not
+used" would be a guess.
 ]]
 function Lines.ForItemUses(itemId)
     local lines = {}
     local _, pending = AddRecipeUses(lines, itemId)
+    AddClassUses(lines, itemId)
     AddQuestUses(lines, itemId)
     return lines, pending
 end

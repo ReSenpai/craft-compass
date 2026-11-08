@@ -32,6 +32,7 @@ L.WowheadPage = "Страница на Wowhead"
 L.CopyUrlClickHint = "Щелчок — скопировать адрес."
 L.CopyUrlHint = "Нажмите Ctrl+C — адрес скопируется, а окно закроется. Затем вставьте его в браузер."
 L.AndMore = "и ещё %d"
+L.Rank = "ранг %d"
 
 -- Настройки
 L.OptionsTitle = "Craft Compass"

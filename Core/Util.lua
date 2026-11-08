@@ -106,7 +106,7 @@ local function GetInterface()
     return select(4, GetBuildInfo()) or 0
 end
 
-local function IsTBC()
+function Util.IsTBC()
     local interface = GetInterface()
     return interface >= 20000 and interface < 30000
 end
@@ -122,7 +122,7 @@ end
 --- A page on Wowhead (kind "item", "spell" or "quest"), for the client's game version and language.
 function Util.WowheadUrl(kind, id)
     local site = "classic"
-    if IsTBC() then
+    if Util.IsTBC() then
         site = "tbc"
     elseif Util.IsForever() then
         site = "forever"

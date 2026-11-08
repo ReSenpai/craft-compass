@@ -29,6 +29,7 @@ L.WowheadPage = "Wowhead page"
 L.CopyUrlClickHint = "Click to copy the address."
 L.CopyUrlHint = "Press Ctrl+C: the address is copied and this window closes. Then paste it into your browser."
 L.AndMore = "and %d more"
+L.Rank = "rank %d"
 
 -- Options
 L.OptionsTitle = "Craft Compass"

@@ -27,7 +27,8 @@ know where to get.*
 ### What an item is used for
 
 Hold **Shift** (or Ctrl) over an item: the recipes it goes into, by profession and skill with how many of it each
-takes, and the quests that ask for it, the completed ones marked.
+takes, the class spells it is a reagent of (Fish Oil — a shaman's Water Walking, Rune of Teleportation — a mage's
+teleports), and the quests that ask for it, the completed ones marked.
 
 ![Shift over Refreshing Spring Water in the bag: where to get it, the cooking and engineering recipes and the quest that use it](docs/images/shift-tooltip.png)
 

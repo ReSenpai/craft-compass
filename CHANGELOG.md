@@ -2,6 +2,13 @@
 
 All notable changes to Craft Compass. The text of this file goes into each release's notes.
 
+## 0.5.8 — 2026-11-08
+
+- Class reagents: an item a class spell takes shows the class and the spell. Fish Oil is for a shaman's Water
+  Walking, Light Feather for a mage's Slow Fall and a priest's Levitate, the seeds for a druid's Rebirth with its
+  rank, runes for a mage's teleports and portals of the character's faction, Soul Shards for a warlock's demons and
+  stones. The spell's own tooltip opens over the row, and Alt opens its window.
+
 ## 0.5.7 — 2026-11-07
 
 - The warning about two AtlasLoots enabled at once names them as the game's AddOns list does. On Forever that is
