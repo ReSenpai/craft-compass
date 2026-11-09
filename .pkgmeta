@@ -1,5 +1,12 @@
 package-as: CraftCompass
 
+# CurseForge relations of every uploaded file (they are set per file, not per project): the app installs the
+# required ones along with Craft Compass.
+required-dependencies:
+  - atlasloot-continued
+optional-dependencies:
+  - questie
+
 manual-changelog:
   filename: CHANGELOG.md
   markup-type: markdown
