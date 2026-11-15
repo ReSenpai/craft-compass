@@ -520,20 +520,29 @@ function PinWindow.Show(parent, link)
     })
 end
 
---- Opens the whole list a source row stands for (all zones, vendors, quests) in a nested window.
+--[[
+Opens the whole list a source row stands for (all zones, vendors, quests of an item, or the guild
+members with a profession) in a nested window.
+]]
 function PinWindow.OpenList(row)
     local open = row.open
-    local _, link = Util.GetItemInfo(open.itemId)
+    local link
+    if open.itemId then
+        link = select(2, Util.GetItemInfo(open.itemId))
+    end
     ShowContent(WindowFor(row.craftCompassWindow), {
-        key = open.kind .. ":" .. open.itemId,
+        key = open.kind .. ":" .. (open.itemId or open.profession),
         titleLink = link,
         title = function ()
+            if not open.itemId then
+                return open.label
+            end
             local _, itemLink = Util.GetItemInfo(open.itemId)
             return open.label .. ": " .. (itemLink or ("#" .. open.itemId))
         end,
         build = function ()
             local lines, pending = Lines.ForList(open)
-            return lines, pending or link == nil
+            return lines, pending or (open.itemId ~= nil and link == nil)
         end
     })
 end

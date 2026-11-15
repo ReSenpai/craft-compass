@@ -61,6 +61,7 @@ GetBuildInfo = function() return "1.15.9", "1", "Nov 1 2026", 11509 end
 BackdropTemplateMixin = {}
 C_Timer = {NewTicker = function(_, fn) return {Cancel = function() end} end, After = function(_, fn) fn() end}
 geterrorhandler = function() return function(e) error(e) end end
+GetTime = function() return 100 end
 GetLocale = function() return LOCALE end
 UnitRace = function() return "Human", "Human", 1 end
 UnitClass = function() return "Warrior", "WARRIOR", 1 end
@@ -72,6 +73,7 @@ GetSkillLineInfo = function() return "Leatherworking" end
 local names = {[2318] = "Light Leather", [2320] = "Coarse Thread", [2302] = "Handstitched Leather Boots", [9999] = "Pattern: Boots", [13463] = "Dreamfoil", [17056] = "Light Feather", [17031] = "Rune of Teleportation"}
 GetItemInfo = function(id) if names[id] then return names[id], "|cffffffff|Hitem:" .. id .. "::::|h[" .. names[id] .. "]|h|r" end end
 GetItemIcon = function(id) return 134000 + id end
+GetItemInfoInstant = function(id) if id == 2302 then return id, "Armor", "Leather", "INVTYPE_FEET" end end
 GetItemCount = function(id) return id == 2318 and 5 or 0 end
 GetSpellInfo = function(id) return ({[2108] = "Leatherworking", [2259] = "Alchemy"})[id] or ("Spell" .. id) end
 GetSpellTexture = function(id) return 1000 + id end
@@ -112,6 +114,10 @@ AtlasLoot = {Data = {
     Profession = {GetProfessionData = function(id)
         if id == 2149 then return {2302, 3, 1, 40, 70, {2318, 2320}, {2, 1}} end
         if id == 2152 then return {nil, 3, 30, 30, 60, {2318}, {3}} end
+        -- Enchants for boots, a TBC one too, which Classic Era hasn't got.
+        if id == 20023 then return {nil, 10, 295, 315, 355, {16203}, {8}} end
+        if id == 13935 then return {nil, 10, 235, 255, 295, {11175}, {1}} end
+        if id == 27954 then return {nil, 10, 370, 380, 390, {22450}, {1}} end
     end},
     Recipe = {GetRecipeForSpell = function(id) if id == 2149 then return 9999 end end}
 }}
@@ -446,6 +452,103 @@ GameTooltip.SetAction = function(_, slot) p("tooltip set again from action " .. 
 GameTooltip.owner, GameTooltip.shown = actionButton, true
 GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(2318)
 FIRE("MODIFIER_STATE_CHANGED")
+
+-- Forever's guild club: who has the craft's profession, nearest first; a click whispers them.
+IsInGuild = function() return true end
+local function Member(name, classID, zone, presence, professions, extra)
+    local info = {name = name, level = 30, classID = classID, zone = zone, presence = presence,
+        profession1ID = professions[1], profession2ID = professions[2]}
+    for k, v in pairs(extra or {}) do info[k] = v end
+    return info
+end
+local roster = {
+    Member("Far Tanner", 8, "Orgrimmar", 1, {165, 393}),
+    Member("Old Tanner", 1, "Westfall", 3, {165}, {lastOnlineDay = 3}),
+    Member("Coast Tanner", 8, "Westfall", 1, {182, 165}),
+    Member("Dusk Tanner", 1, "Duskwood", 1, {165}),
+    Member("Near Tanner", 1, "Elwynn Forest", 1, {165}),
+    Member("Recent Tanner", 1, "Elwynn Forest", 3, {165}, {lastOnlineHour = 2}),
+    Member("Me", 1, "Elwynn Forest", 1, {165}, {isSelf = true}),
+    Member("Miner", 1, "Elwynn Forest", 1, {186}),
+    Member("Enchanter", 8, "Duskwood", 1, {333, 197})
+}
+C_Club = {
+    GetGuildClubId = function() return 7 end,
+    GetClubMembers = function() local ids = {}; for i = 1, #roster do ids[i] = i end; return ids end,
+    GetMemberInfo = function(_, id) return roster[id] end
+}
+C_CreatureInfo = {GetClassInfo = function(id) return {classFile = ({[1] = "WARRIOR", [8] = "MAGE"})[id]} end}
+GetRealZoneText = function() return "Elwynn Forest" end
+-- The character in Elwynn Forest; Duskwood is nearer than Westfall, Orgrimmar is on another continent.
+local maps = {
+    [1429] = {mapID = 1429, name = "Elwynn Forest", mapType = 3, parentMapID = 1415, world = {0, 0, 0}},
+    [1436] = {mapID = 1436, name = "Westfall", mapType = 3, parentMapID = 1415, world = {0, -1000, 500}},
+    [1431] = {mapID = 1431, name = "Duskwood", mapType = 3, parentMapID = 1415, world = {0, 300, 800}},
+    [1454] = {mapID = 1454, name = "Orgrimmar", mapType = 3, parentMapID = 1414, world = {1, 0, 0}},
+    [1415] = {mapID = 1415, mapType = 2, parentMapID = 947},
+    [1414] = {mapID = 1414, mapType = 2, parentMapID = 947},
+    [947] = {mapID = 947, mapType = 1, parentMapID = 0}
+}
+CreateVector2D = function(x, y) return {GetXY = function() return x, y end} end
+C_Map.GetBestMapForUnit = function() return 1429 end
+C_Map.GetMapInfo = function(id) return maps[id] end
+C_Map.GetMapChildrenInfo = function(id, mapType, all)
+    local children = {}
+    if id == 947 and mapType == 3 and all then
+        for _, map in pairs(maps) do if map.world then children[#children + 1] = map end end
+    end
+    return children
+end
+C_Map.GetPlayerMapPosition = function() return CreateVector2D(0.4, 0.6) end
+C_Map.GetWorldPosFromMapPos = function(id, position)
+    local world, x, y = maps[id].world, position:GetXY()
+    return world[1], CreateVector2D(world[2] + (x - 0.5) * 10, world[3] + (y - 0.5) * 10)
+end
+C_GuildInfo = {GuildRoster = function() p("roster requested") end}
+ChatFrameUtil = {SendTell = function(name) p("whisper to " .. name) end}
+
+local guildOpen
+for _, line in ipairs((ns.Lines.ForCraft(ns.Crafts.ForCreatedItem(2302)))) do
+    if line.open and line.open.kind == "guild" then
+        guildOpen = line.open
+        p("guild line: " .. line.text .. " -> " .. line.open.label)
+    end
+end
+ns.PinWindow.OpenList({open = guildOpen})
+p("guild window: " .. tostring(CraftCompassWindow1.title.text.text))
+local firstRow
+for _, row in ipairs(CraftCompassWindow1.rows) do
+    if row.shown then
+        p("  " .. row.text.text .. " | " .. row.right.text .. (row.action and " action" or ""))
+        firstRow = firstRow or row
+    end
+end
+firstRow.scripts.OnClick(firstRow, "LeftButton")
+-- Herbs show the herbalists, and nothing is shown out of a guild.
+GameTooltip.owner = UIParent
+GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(13463)
+SHIFT, ALT = true, false
+GameTooltip.scripts.OnTooltipSetItem(GameTooltip)
+dump("shift over Dreamfoil in a guild")
+-- Boots: the enchants for them, in a list window with the guild's enchanters.
+GameTooltip.itemName, GameTooltip.itemLink = GetItemInfo(2302)
+GameTooltip.scripts.OnTooltipSetItem(GameTooltip)
+dump("shift over boots")
+local enchantsOpen
+for _, line in ipairs((ns.Lines.ForItemUses(2302))) do
+    if line.open and line.open.kind == "enchants" then
+        enchantsOpen = line.open
+    end
+end
+ns.PinWindow.OpenList({open = enchantsOpen})
+p("enchants window: " .. tostring(CraftCompassWindow1.title.text.text))
+for _, row in ipairs(CraftCompassWindow1.rows) do
+    if row.shown then
+        p("  " .. row.text.text .. (row.right.text ~= "" and " | " .. row.right.text or ""))
+    end
+end
+IsInGuild = function() return false end
+p("out of a guild: " .. tostring(ns.Guild.ForProfession(3)))
 return table.concat(out, "\n")
 """)
 print(result)

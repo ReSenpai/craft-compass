@@ -28,7 +28,9 @@ know where to get.*
 
 Hold **Shift** (or Ctrl) over an item: the recipes it goes into, by profession and skill with how many of it each
 takes, the class spells it is a reagent of (Fish Oil — a shaman's Water Walking, Rune of Teleportation — a mage's
-teleports), and the quests that ask for it, the completed ones marked.
+teleports), and the quests that ask for it, the completed ones marked. A weapon or a piece of armour shows the
+enchants each of its slots can take; in a pinned window that line opens the list of them, with the Enchanting skill
+each one needs, and each enchant opens what it takes.
 
 ![Shift over Refreshing Spring Water in the bag: where to get it, the cooking and engineering recipes and the quest that use it](docs/images/shift-tooltip.png)
 
@@ -97,6 +99,10 @@ Simplified Chinese), in English otherwise, and on Wowhead's Classic, TBC or Fore
 
   ![The quest Elixirs for the Bladeleafs opened from Elixir of Lion's Strength: what it asks, who gives it, what to bring; Questie's tooltip beside it](docs/images/quest-window.png)
 
+- **Who in the guild.** Where the game gives guild members' professions (Classic Era and Forever), a recipe, a
+  gathered resource and the enchants show how many guild members have the profession and how many are online. The
+  line opens the list of them with their zone, the nearest to you first and those offline last; click a name to
+  whisper them.
 - **Quests in chat.** Shift-click a quest in a pinned window to link it in chat, in the `[Name (id)]` form Questie
   turns into a clickable quest link.
 - **Any client language.** Everything is looked up by id, and item, quest, profession and zone names come in the
@@ -157,6 +163,8 @@ only.
   reagent and by created item.
 - `Sources/Questie.lua` — the same for QuestieDB's quests, indexed by the items they ask for; quest, NPC and zone
   names.
+- `Sources/Enchants.lua` — which enchants each equipment slot takes; `Sources/Guild.lua` — the guild members with a
+  profession, nearest first.
 - `Core/Lines.lua` — builds the lines for "what is this for" and "what does this craft take".
 - `UI/Tooltip.lua` — the tooltip hooks; `UI/PinWindow.lua` — the pinned windows; `Core/Options.lua` — the settings.
 - `Libs/` — the Ace3 libraries behind the options panel.

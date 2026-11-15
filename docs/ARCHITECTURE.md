@@ -35,6 +35,8 @@ The files load in the order the TOC lists them. Each one is a module on the shar
 | `Sources/Questie.lua` | `ns.Quests` | Quests by item, quest/NPC/zone names, item sources, chat links. |
 | `Sources/Gathering.lua` | `ns.Gathering` | Gathered resources: profession, skill, zones of their herbs and veins. |
 | `Sources/ClassReagents.lua` | `ns.ClassReagents` | Reagents of class spells: class and spell by item. |
+| `Sources/Enchants.lua` | `ns.Enchants` | The enchants of each equipment slot. |
+| `Sources/Guild.lua` | `ns.Guild` | Guild members with a profession, nearest first; whispering them. |
 | `Core/Lines.lua` | `ns.Lines` | Builds the lines: what an item is used for, what a craft takes, where an item comes from. |
 | `UI/PinWindow.lua` | `ns.PinWindow` | Pinned windows, nested windows, chat Alt-click. |
 | `UI/Tooltip.lua` | `ns.Tooltip` | Tooltip hooks, modifier keys, redrawing when names arrive. |
@@ -47,6 +49,10 @@ flowchart TD
     Quests --> Gathering[Sources/Gathering.lua<br>ns.Gathering]
     Gathering --> Lines
     ClassReagents[Sources/ClassReagents.lua<br>ns.ClassReagents] --> Lines
+    Crafts --> Enchants[Sources/Enchants.lua<br>ns.Enchants]
+    Enchants --> Lines
+    Club[(Guild club<br>C_Club)] --> Guild[Sources/Guild.lua<br>ns.Guild]
+    Guild --> Lines
     Crafts --> Lines[Core/Lines.lua<br>ns.Lines]
     Quests --> Lines
     Settings[Core/Init.lua<br>ns.settings] --> Lines
@@ -166,6 +172,32 @@ mage's teleports and portals) and `tbc` for one from Burning Crusade. `ClassReag
 faction's spells and, outside TBC, the TBC ones. Class names and colours come from `LOCALIZED_CLASS_NAMES_MALE` and
 `RAID_CLASS_COLORS`, spell names from the client, so all of it is in the client's language.
 
+### Enchants (`Sources/Enchants.lua`)
+
+AtlasLoot has every enchant with its skill and reagents, but not the slot it is for, so `SPELLS` lists the enchanting
+spells of each slot (weapon, two-handed weapon, cloak, chest, boots, gloves, shield, bracers, ring), `tbc` marking
+those from Burning Crusade. `Enchants.ForItem` takes the item's equip location (`GetItemInfoInstant`) to its slots
+(a two-handed weapon takes both its own enchants and the one-handed ones), keeps the spells AtlasLoot knows on this
+client and sorts them by the skill they need.
+
+### Guild members (`Sources/Guild.lua`)
+
+The guild's club (`C_Club.GetMemberInfo`) gives each member's two professions (`profession1ID`, `profession2ID`),
+with level, class, zone and presence, offline members too, on the clients that have it (Classic Era and Forever;
+elsewhere there are no professions and nothing is shown). It doesn't give the skill (its rank is always 1) nor the
+recipes. `Guild.ForProfession` maps AtlasLoot's profession id to the skill line and returns the members with it and
+how many are online, nearest first:
+
+1. in the character's zone (`GetRealZoneText`);
+2. elsewhere on its continent, by the distance from the character to the middle of their zone: zone centres come
+   once from `C_Map.GetWorldPosFromMapPos` for every zone under the character's top map, the character's place from
+   `C_Map.GetPlayerMapPosition` (the club gives zones, not positions);
+3. online anywhere else (other continents, instances);
+4. offline, the ones seen last first.
+
+The roster is read anew at most every five seconds and whenever the guild changes. `Guild.Whisper` opens the chat
+input to whisper a member (`ChatFrameUtil.SendTell`, names may hold spaces on Forever).
+
 ## The line model (`Core/Lines.lua`)
 
 A line is a table:
@@ -188,7 +220,7 @@ Builders return `lines, pending`, where `pending` means some item names weren't 
 - `Lines.ForItemUses(itemId)` — the recipes the item goes into, grouped by profession (sorted by name), each sorted by
   skill, with the reagent count. Then the class spells it is a reagent of, by class (the character's first), each
   a spell link with its rank where the rank matters. Then the quests that ask for it, for this race and class, sorted by level, completed
-  ones marked. Settings filter both. When there is nothing, it says nothing: the sources don't know every use.
+  ones marked. Then, for equipment, a line per slot with how many enchants it takes and the guild's enchanters. Settings filter both. When there is nothing, it says nothing: the sources don't know every use.
 - `Lines.ForCraft(spellId)` — profession and skill, each reagent with *have/need* (bags and bank, green when enough),
   then the recipe: "trainer", or the recipe item with up to two vendors (the player's faction first) and quest
   rewards, plus "and N more".
@@ -196,7 +228,10 @@ Builders return `lines, pending`, where `pending` means some item names weren't 
   then vendors and quest rewards from QuestieDB. Each list names two and adds "and N more"; names are looked up
   only for those two.
 - `Lines.ForList(open)` — the whole list behind a source line: vendors (the other faction last, greyed out),
-  quests, or every zone, the richest first.
+  quests, or every zone, the richest first; the enchants of an item by slot and skill; or the guild members with a
+  profession, nearest first, each row whispering them on a click.
+- A craft, a gathered resource and the enchants end with a guild line: how many guild members have the profession
+  and how many are online, opening the list of them.
 - `Lines.ForOrigin(itemId)` — `ForCraft` of the item's craft, if it is crafted, followed by `ForSources`.
 - `Lines.ForWindow(itemId)` — for a pinned window: `ForOrigin`, then `ForItemUses`, then the item's Wowhead page
   (`Util.WowheadUrl`: `classic` or `tbc` by the client's interface version, and its language folder). Reagents

@@ -16,7 +16,8 @@ Builders return the lines and whether some item names weren't cached yet, in whi
 caller draws them again once GET_ITEM_INFO_RECEIVED brings them.
 ]]
 local _, ns = ...
-local L, Util, Crafts, Quests, Gathering, ClassReagents = ns.L, ns.Util, ns.Crafts, ns.Quests, ns.Gathering, ns.ClassReagents
+local L, Util, Crafts, Quests, Gathering, ClassReagents, Enchants, Guild =
+    ns.L, ns.Util, ns.Crafts, ns.Quests, ns.Gathering, ns.ClassReagents, ns.Enchants, ns.Guild
 
 local Lines = {}
 ns.Lines = Lines
@@ -171,8 +172,60 @@ local function AddQuestUses(lines, itemId)
 end
 
 --[[
-What an item is used for: the recipes it goes into, the class spells it is a reagent of and the
-quests that ask for it. Nothing found says nothing: the sources don't know every use, so "not
+How many guild members have a profession and how many of them are online, in a line that opens
+the list of them, nearest first. Nothing without guild members with it (or guild data: Forever's
+club alone gives professions).
+]]
+local function AddGuildLine(lines, professionId)
+    local members, online = Guild.ForProfession(professionId)
+    if not members or #members == 0 then
+        return
+    end
+    local name = Crafts.GetProfession(professionId)
+    table.insert(lines, {
+        text = L.InGuild .. ": |cffffffff" .. string.format(L.GuildCount, online, #members) .. "|r",
+        color = MUTED_COLOR,
+        open = {kind = "guild", profession = professionId, label = string.format(L.GuildProfession, name or "")}
+    })
+end
+
+-- The name of each enchant slot (Enchants.ForItem).
+local SLOT_NAMES = {
+    weapon = "SlotWeapon", twoHand = "SlotTwoHand", cloak = "SlotCloak", chest = "SlotChest", feet = "SlotFeet",
+    hand = "SlotHand", shield = "SlotShield", wrist = "SlotWrist", finger = "SlotFinger"
+}
+
+local function SlotName(slot)
+    local name = L[SLOT_NAMES[slot]]
+    if slot == "finger" then
+        name = name .. " (" .. L.OwnRingsOnly .. ")"
+    end
+    return name
+end
+
+--[[
+The enchants an item can take: a line for each slot with how many there are, opening the list of
+them, and the guild's enchanters.
+]]
+local function AddEnchants(lines, itemId)
+    local groups = Enchants.ForItem(itemId)
+    if #groups == 0 then
+        return
+    end
+    local _, icon = Crafts.GetProfession(Enchants.PROFESSION)
+    local open = {kind = "enchants", itemId = itemId, label = L.Enchants}
+    table.insert(lines, {spacer = true})
+    table.insert(lines, {text = Util.Icon(icon) .. L.Enchants, color = HEADER_COLOR})
+    for _, group in ipairs(groups) do
+        table.insert(lines, {text = SlotName(group.slot) .. ": |cffffffff" .. #group.crafts .. "|r", color = MUTED_COLOR,
+            open = open})
+    end
+    AddGuildLine(lines, Enchants.PROFESSION)
+end
+
+--[[
+What an item is used for: the recipes it goes into, the class spells it is a reagent of, the
+quests that ask for it and the enchants it can take. Nothing found says nothing: the sources don't know every use, so "not
 used" would be a guess.
 ]]
 function Lines.ForItemUses(itemId)
@@ -180,6 +233,7 @@ function Lines.ForItemUses(itemId)
     local _, pending = AddRecipeUses(lines, itemId)
     AddClassUses(lines, itemId)
     AddQuestUses(lines, itemId)
+    AddEnchants(lines, itemId)
     return lines, pending
 end
 
@@ -292,6 +346,7 @@ function Lines.ForSources(itemId)
             open = #zones > 0 and zonesOpen or nil
         })
         AddNamesLine(lines, zonesOpen, FirstNames(zones, ZoneName, nil, ZONES_SHOWN))
+        AddGuildLine(lines, professionId)
     end
     if not AddSources(lines, itemId) and not name then
         return nil
@@ -347,6 +402,47 @@ function Lines.ForList(open)
         table.insert(lines, {text = L.ZonesOrder, color = MUTED_COLOR})
         for _, zoneId in ipairs(Gathering.GetZones(open.itemId)) do
             table.insert(lines, {text = ZoneName(zoneId)})
+        end
+        return lines, pending
+    end
+
+    if open.kind == "guild" then
+        Guild.RequestUpdate()
+        for _, member in ipairs(Guild.ForProfession(open.profession) or {}) do
+            local _, color = ClassReagents.GetClass(member.classFile)
+            local place = member.zone or ""
+            if not member.online then
+                local days = math.floor(member.hoursAway / 24)
+                place = days > 0 and string.format(L.OfflineDays, days) or L.Offline
+            end
+            local name = member.name
+            table.insert(lines, {
+                text = "[" .. (member.level or "?") .. "] " .. name,
+                color = member.online and color or MUTED_COLOR,
+                right = place,
+                rightColor = member.near == 1 and ENOUGH_COLOR or MUTED_COLOR,
+                action = function ()
+                    Guild.Whisper(name)
+                end,
+                hint = L.WhisperHint
+            })
+        end
+        return lines, pending
+    end
+
+    if open.kind == "enchants" then
+        table.insert(lines, {text = L.EnchantsSkill, color = MUTED_COLOR})
+        AddGuildLine(lines, Enchants.PROFESSION)
+        for _, group in ipairs(Enchants.ForItem(open.itemId)) do
+            table.insert(lines, {spacer = true})
+            table.insert(lines, {text = SlotName(group.slot), color = HEADER_COLOR})
+            for _, enchant in ipairs(group.crafts) do
+                local link = Util.GetSpellLink(enchant.spellId)
+                table.insert(lines, {
+                    text = "[" .. enchant.skill .. "] " .. Util.Icon(Util.GetSpellIcon(enchant.spellId)) .. (link or "..."),
+                    link = link
+                })
+            end
         end
         return lines, pending
     end
@@ -427,6 +523,7 @@ function Lines.ForCraft(spellId)
     else
         table.insert(lines, {text = L.Recipe .. ": |cffffffff" .. L.Trainer .. "|r", color = MUTED_COLOR})
     end
+    AddGuildLine(lines, craft[2])
     return lines, pending
 end
 

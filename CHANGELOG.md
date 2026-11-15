@@ -2,6 +2,18 @@
 
 All notable changes to Craft Compass. The text of this file goes into each release's notes.
 
+## 0.5.9 — 2026-11-15
+
+- Enchants: Shift over a weapon, shield, cloak, chest, boots, gloves or bracers (and, in TBC, a ring) shows how
+  many enchants each of its slots can take; a two-handed weapon takes both its own and the one-handed ones. In a
+  pinned window the line opens the whole list, by the Enchanting skill each enchant needs: hover one for what it
+  does, click it for what it takes and where its formula comes from.
+- Guild members with a profession, where the game gives them (Classic Era and Forever): a recipe, a gathered
+  resource and the enchants show how many guild members have the profession and how many of them are online. In a
+  pinned window the line opens the list of them with their level, class and zone, the nearest first: your zone,
+  then the rest of your continent by distance, then everyone else online, then those offline, seen last first.
+  Click a name to whisper them. The game says who has a profession, not their skill or recipes.
+
 ## 0.5.8 — 2026-11-08
 
 - Class reagents: an item a class spell takes shows the class and the spell. Fish Oil is for a shaman's Water
